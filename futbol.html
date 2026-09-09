@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jerseys de futbol — Deportes Martínez</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="description" content="Jerseys de futbol: retro y de colección, equipaciones de temporada, versión jugador y fan. Filtra por equipo, liga, temporada y talla.">
+  <link rel="canonical" href="https://deportesmartinez.com.mx/futbol.html">
+  <meta name="theme-color" content="#08070a">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Deportes Martínez">
+  <meta property="og:locale" content="es_MX">
+  <meta property="og:title" content="Jerseys de futbol — Deportes Martínez">
+  <meta property="og:description" content="Jerseys de futbol: retro y de colección, equipaciones de temporada, versión jugador y fan. Filtra por equipo, liga, temporada y talla.">
+  <meta property="og:url" content="https://deportesmartinez.com.mx/futbol.html">
+  <meta property="og:image" content="https://deportesmartinez.com.mx/fotos/logo/logo-og.png">
+  <meta property="og:image:alt" content="Logo de Deportes Martínez">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Jerseys de futbol — Deportes Martínez">
+  <meta name="twitter:description" content="Jerseys de futbol: retro y de colección, equipaciones de temporada, versión jugador y fan. Filtra por equipo, liga, temporada y talla.">
+  <meta name="twitter:image" content="https://deportesmartinez.com.mx/fotos/logo/logo-og.png">
+  <link rel="icon" href="fotos/logo/favicon.png">
+  <link rel="stylesheet" href="css/styles.css?v=76">
+</head>
+<body>
+  <header class="hdr">
+    <div class="wrap hdr__in">
+      <a href="index.html" class="brand" aria-label="Deportes Martínez">
+        <img class="brand__iso" src="fotos/logo/favicon.png" alt="">
+        <span class="brand__word">
+          <span class="brand__name">DEPORTES MARTÍNEZ</span>
+          <span class="brand__sub">Cumplimos sueños y vestimos campeones</span>
+        </span>
+      </a>
+      <nav class="nav">
+        <a href="futbol.html">Futbol</a>
+        <a href="basket.html">Basketball</a>
+        <a href="americano.html">Americano</a>
+        <a href="index.html#noticias">Novedades</a>
+        <a href="index.html#contacto">Contacto</a>
+      </nav>
+      <button class="cart-btn" id="openCart">
+        <span>Carrito</span>
+        <span class="count" id="cartCount">0</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="wrap sec sec--top">
+    <div class="sec__head reveal">
+      <div><h2>Jerseys de futbol</h2><p>Retro, actuales, versión jugador y fan. Clubes y selecciones.</p></div>
+      <a href="index.html" class="volver">← Inicio</a>
+    </div>
+    <div id="catalogo" data-categoria="futbol">
+      <div class="filtros" id="filtros"></div>
+      <div class="grid" id="grid"></div>
+    </div>
+  </main>
+
+  <footer class="ftr">
+    <div class="wrap ftr__grid">
+      <div class="ftr__brand">
+        <img class="ftr__iso" src="fotos/logo/logo-horizontal.webp" alt="">
+        <p class="ftr__tag">Cumplimos sueños y vestimos campeones</p>
+      </div>
+      <div class="ftr__col">
+        <h4>Tienda</h4>
+        <a href="futbol.html">Futbol</a>
+        <a href="basket.html">Basketball</a>
+        <a href="americano.html">Americano</a>
+        </div>
+      <div class="ftr__col">
+        <h4>Información</h4>
+        <a href="legales.html#terminos">Términos de servicio</a>
+        <a href="legales.html#privacidad">Aviso de privacidad</a>
+        <a href="legales.html#devoluciones">Cambios y devoluciones</a>
+        <a href="legales.html#envios">Envíos</a>
+      </div>
+      <div class="ftr__col">
+        <h4>Compra segura</h4>
+        <p>Jerseys de calidad, revisados uno por uno.<br>Personalización con nombre y número.<br>Envíos a todo México.</p>
+      </div>
+      <div class="ftr__col">
+        <h4>Contáctanos</h4>
+        <a href="tel:+523324469055">33 2446 9055</a>
+        <a href="tel:+523333895508">33 3389 5508</a>
+        <a href="https://www.instagram.com/_deportes_martinez_/" target="_blank" rel="noopener">Instagram</a>
+      </div>
+    </div>
+    <div class="wrap ftr__bottom">
+      <span>© 2026 Deportes Martínez</span>
+      <span class="ftr__pay">Pagos seguros · Mercado Pago · Transferencia</span>
+    </div>
+  </footer>
+
+  <div class="overlay" id="overlay"></div>
+  <aside class="drawer" id="drawer" aria-label="Carrito">
+    <div class="drawer__head">
+      <h3>Tu carrito</h3>
+      <button class="icon-btn" id="closeCart">✕</button>
+    </div>
+    <div class="drawer__body" id="cartBody"></div>
+    <div class="drawer__foot" id="cartFoot" hidden>
+      <div class="promo-caja">
+        <button type="button" class="promo-abrir" id="promoAbrir">¿Tienes un código de descuento?</button>
+        <div class="promo-campo" id="promoCampo" hidden>
+          <input id="promoInput" placeholder="Escríbelo aquí" autocapitalize="characters" autocomplete="off">
+          <button type="button" id="promoAplicar">Aplicar</button>
+        </div>
+        <p class="promo-aviso" id="promoAviso" hidden></p>
+      </div>
+      <div class="drawer__desc" id="cartDesc" hidden></div>
+      <div class="drawer__total"><span>Total</span><b id="cartTotal">$0</b></div>
+      <button class="checkout" id="checkout">
+        <span>Finalizar pedido<small>Te llevamos a completar tu compra</small></span>
+      </button>
+    </div>
+  </aside>
+
+  <div class="toast-wrap" id="toasts"></div>
+  <script type="module" src="js/store.js?v=76"></script>
+  <script type="module" src="js/asesor.js?v=76"></script>
+  <script type="module" src="js/auth.js?v=76"></script>
+  <script type="module" src="js/cookies.js?v=76"></script>
+</body>
+</html>
