@@ -1,0 +1,4 @@
+# La tienda todavía no se publica en buscadores: el cliente aún no confirma.
+# Cuando decida quedársela, se quita este bloqueo y el "noindex" de cada página.
+User-agent: *
+Disallow: /
