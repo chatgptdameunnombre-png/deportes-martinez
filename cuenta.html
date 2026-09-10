@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi cuenta — Deportes Martínez</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="description" content="Tu cuenta de Deportes Martínez: tus datos de envío y tus pedidos.">
+  <link rel="canonical" href="https://deportesmartinez.com.mx/cuenta.html">
+  <meta name="theme-color" content="#08070a">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Deportes Martínez">
+  <meta property="og:locale" content="es_MX">
+  <meta property="og:title" content="Mi cuenta — Deportes Martínez">
+  <meta property="og:description" content="Tu cuenta de Deportes Martínez: tus datos de envío y tus pedidos.">
+  <meta property="og:url" content="https://deportesmartinez.com.mx/cuenta.html">
+  <meta property="og:image" content="https://deportesmartinez.com.mx/fotos/logo/logo-og.png">
+  <meta property="og:image:alt" content="Logo de Deportes Martínez">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Mi cuenta — Deportes Martínez">
+  <meta name="twitter:description" content="Tu cuenta de Deportes Martínez: tus datos de envío y tus pedidos.">
+  <meta name="twitter:image" content="https://deportesmartinez.com.mx/fotos/logo/logo-og.png">
+  <link rel="icon" href="fotos/logo/favicon.png">
+  <link rel="stylesheet" href="css/styles.css?v=76">
+</head>
+<body>
+  <header class="hdr">
+    <div class="wrap hdr__in">
+      <a href="index.html" class="brand" aria-label="Deportes Martínez">
+        <img class="brand__iso" src="fotos/logo/favicon.png" alt="">
+        <span class="brand__word">
+          <span class="brand__name">DEPORTES MARTÍNEZ</span>
+          <span class="brand__sub">Cumplimos sueños y vestimos campeones</span>
+        </span>
+      </a>
+      <nav class="nav">
+        <a href="futbol.html">Futbol</a>
+        <a href="basket.html">Basketball</a>
+        <a href="americano.html">Americano</a>
+        <a href="index.html#noticias">Novedades</a>
+        <a href="index.html#contacto">Contacto</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap sec" style="max-width:640px">
+    <div class="sec-head">
+      <span class="eyebrow">Tu cuenta</span>
+      <h2>Mi cuenta</h2>
+      <span class="rule"></span>
+    </div>
+
+    <div id="cuentaOut" style="display:none;text-align:center;padding:30px 0">
+      <p style="color:#9a9aa2;font-size:15px;margin-bottom:18px">Inicia sesión para ver tus datos y guardar tu dirección de entrega.</p>
+      <button id="cuentaEntrar" class="btn-cta" type="button">Entrar / Crear cuenta</button>
+    </div>
+
+    <div id="cuentaIn" style="display:none">
+      <p class="mc-quien">Tu cuenta: <b id="cuentaEmail"></b></p>
+
+      <div id="cuentaPanel" style="display:none;margin:0 0 22px">
+        <a href="panel.html" class="btn-cta" style="display:inline-block">Ir al Panel del dueño →</a>
+      </div>
+
+      <details class="mc-datos" open>
+        <summary class="mc-datos__cab">
+          <span>Mis datos de entrega</span>
+          <span class="mc-datos__pista" id="mcPista"></span>
+        </summary>
+        <p class="mc-datos__ayuda">Guárdalos una vez y en tus próximas compras solo los confirmas.</p>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <input id="fNombre" class="cInp" placeholder="Nombre completo">
+          <input id="fTel" class="cInp" placeholder="Teléfono" inputmode="tel">
+          <input id="fCalle" class="cInp" placeholder="Calle y número">
+          <div style="display:flex;gap:10px">
+            <input id="fCol" class="cInp" placeholder="Colonia" style="flex:2">
+            <input id="fCP" class="cInp" placeholder="C.P." inputmode="numeric" style="flex:1">
+          </div>
+          <div style="display:flex;gap:10px">
+            <input id="fCiudad" class="cInp" placeholder="Ciudad" style="flex:1">
+            <input id="fEstado" class="cInp" placeholder="Estado" style="flex:1">
+          </div>
+          <input id="fRef" class="cInp" placeholder="Referencias (opcional)">
+          <div id="cuentaMsg" style="min-height:18px;font-size:13px"></div>
+          <button id="cuentaGuardar" class="btn-cta" type="button">Guardar mis datos</button>
+        </div>
+      </details>
+
+      <section class="mc-sec">
+        <h3 class="mc-h">Mis pedidos</h3>
+        <div id="misCompras"><p class="mc-vacio">Cargando…</p></div>
+      </section>
+
+      <div style="margin-top:26px">
+        <button id="cuentaSalir" class="btn-ghost" type="button">Cerrar sesión</button>
+      </div>
+    </div>
+  </main>
+
+  <div class="toast-wrap" id="toasts"></div>
+
+  <style>
+    .cInp{width:100%;padding:12px 14px;border-radius:11px;border:1px solid #2a2a30;background:#0e0e11;color:#f4f4f5;font-size:16px;outline:none;box-sizing:border-box}
+
+    /* ===== Mi cuenta: los pedidos primero ===== */
+    .mc-quien{color:#8a8a92;font-size:13px;margin:0 0 22px;word-break:break-word}
+    .mc-quien b{color:#d8d8de;font-weight:700}
+    .mc-h{font-family:var(--display,serif);font-size:22px;margin:0 0 16px}
+    .mc-sec{margin-bottom:34px}
+
+    .mc-card{background:#101014;border:1px solid #24242c;border-radius:16px;padding:16px 17px;margin-bottom:14px}
+    .mc-card__top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+    .mc-estado{font-size:12px;font-weight:800;letter-spacing:.03em;border:1px solid;border-radius:999px;padding:4px 12px}
+    .mc-fecha{font-size:12.5px;color:#7a7a82;margin-left:auto}
+
+    .mc-jersey{display:flex;gap:13px;align-items:center;padding:4px 0}
+    .mc-jersey b{font-size:15px;display:block;line-height:1.35}
+    .mc-foto{width:60px;height:60px;border-radius:10px;object-fit:cover;background:#0e121d;flex:0 0 auto}
+    .mc-foto--vacia{border:1px dashed #2e2e38}
+    .mc-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
+    .mc-tag{font-size:11.5px;font-weight:700;color:#b8b8c0;background:#1c1c24;border-radius:6px;padding:3px 9px}
+    .mc-tag--oro{background:#2a2109;color:#f7d154}
+
+    /* los tres pasos del pedido */
+    .mc-pasos{display:flex;align-items:center;gap:6px;margin:16px 0 0}
+    .mc-paso{display:flex;align-items:center;gap:7px;flex:1;font-size:11.5px;color:#6e6e78;letter-spacing:.02em}
+    .mc-paso__bola{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;
+      background:#1a1a20;border:1px solid #2c2c36;font-size:11px;font-weight:800;flex:0 0 auto}
+    .mc-paso.hecho{color:#a8a8b0}
+    .mc-paso.hecho .mc-paso__bola{background:#2a2109;border-color:#4a3f18;color:#f7d154}
+    .mc-paso.ahora{color:#f4f4f5;font-weight:800}
+    .mc-paso.ahora .mc-paso__bola{background:var(--accent,#e8b923);border-color:var(--accent,#e8b923);color:#1a1405}
+
+    .mc-nota{font-size:13px;color:#c0c0c8;line-height:1.6;margin:14px 0 0;
+      background:#15151a;border-radius:10px;padding:11px 13px}
+    .mc-folio{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px;
+      background:#15151a;border:1px dashed #2e2e38;border-radius:10px;padding:10px 13px}
+    .mc-folio__k{font-size:11.5px;color:#8a8a92;letter-spacing:.04em;text-transform:uppercase}
+    .mc-folio__v{font-family:var(--mono,monospace);font-size:16px;letter-spacing:.08em;color:#f4f4f5}
+    .mc-folio__cp{margin-left:auto;background:none;border:1px solid #2e2e38;color:var(--accent,#e8b923);
+      border-radius:7px;padding:5px 11px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit}
+    .mc-folio__cp:hover{border-color:var(--accent,#e8b923)}
+
+    .mc-card__pie{display:flex;justify-content:space-between;align-items:baseline;gap:10px;
+      margin-top:14px;padding-top:13px;border-top:1px solid #22222a;font-size:13px;color:#8a8a92}
+    .mc-card__pie b{font-size:17px;color:var(--accent,#e8b923)}
+
+    .mc-vacio{background:#101014;border:1px dashed #2a2a32;border-radius:14px;padding:26px 20px;text-align:center;color:#9a9aa2;font-size:13.5px}
+    .mc-vacio b{display:block;color:#f4f4f5;font-size:16px;margin-bottom:6px}
+    .mc-vacio p{margin:0 0 14px;line-height:1.6}
+
+    /* los datos de entrega van plegados: ya los llenó una vez */
+    .mc-datos{background:#101014;border:1px solid #24242c;border-radius:14px;padding:2px 17px;margin-bottom:34px}
+    .mc-datos__cab{cursor:pointer;list-style:none;display:flex;align-items:center;gap:10px;
+      padding:16px 0;font-size:16px;font-weight:700}
+    .mc-datos__cab::-webkit-details-marker{display:none}
+    .mc-datos__cab::before{content:"▸";color:var(--accent,#e8b923);font-size:13px;transition:transform .18s}
+    .mc-datos[open] .mc-datos__cab::before{transform:rotate(90deg)}
+    .mc-datos__pista{margin-left:auto;font-size:12px;font-weight:400;color:#8a8a92}
+    .mc-datos__ayuda{color:#8a8a92;font-size:13px;margin:0 0 14px;line-height:1.6}
+    .mc-datos[open]{padding-bottom:18px}
+
+    @media (max-width:520px){
+      .mc-paso span:not(.mc-paso__bola){display:none}
+      .mc-paso{flex:0 0 auto}
+      .mc-pasos{gap:10px}
+      .mc-pasos::after{content:"";flex:1}
+    }
+    .cInp:focus{border-color:var(--accent,#e8b923)}
+  </style>
+
+  <script type="module" src="js/auth.js?v=76"></script>
+  <script type="module" src="js/cuenta.js?v=76"></script>
+  <script type="module" src="js/cookies.js?v=76"></script>
+  <script type="module" src="js/track.js?v=76"></script>
+</body>
+</html>
