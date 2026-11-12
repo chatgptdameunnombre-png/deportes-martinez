@@ -1,4 +1,4 @@
-import { validarPromotor, promoVigente } from "./promotor.js?v=123";
+import { validarPromotor, promoVigente } from "./promotor.js?v=124";
 
 const KEY = "dm_promo_vista";
 
@@ -17,7 +17,7 @@ function mostrar(pr) {
       <button type="button" class="aviso-modal__x" aria-label="Cerrar">×</button>
       <span class="promo-abre__eti">Precio de apertura</span>
       <h2 class="promo-abre__t" id="promoT">Todos los jerseys a <b>$600</b></h2>
-      <p class="promo-abre__p">Para celebrar la apertura de la tienda. Válido hasta el 7 de diciembre.</p>
+      <p class="promo-abre__p">Para celebrar la apertura de la tienda. Válido hasta el 12 de diciembre.</p>
       <a class="btn promo-abre__btn" href="futbol.html">Ver jerseys →</a>
     </div>`;
   const cerrar = () => { m.remove(); document.removeEventListener("keydown", tecla); };
