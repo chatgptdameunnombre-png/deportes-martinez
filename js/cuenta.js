@@ -1,5 +1,5 @@
-import { db } from "./db.js?v=123";
-import { WHATSAPP_NUMERO, BORRAR_CUENTA_WEBHOOK } from "./config.js?v=123";
+import { db } from "./db.js?v=124";
+import { WHATSAPP_NUMERO, BORRAR_CUENTA_WEBHOOK } from "./config.js?v=124";
 const escH = t => String(t ?? "").replace(/[<>&"']/g, c => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;", "'": "&#39;" }[c]));
 const escC = t => String(t ?? "").replace(/[<>&"]/g, c => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" }[c]));
 
