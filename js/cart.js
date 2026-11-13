@@ -1,10 +1,10 @@
-import { ENVIO_DOMICILIO, PERSONALIZACION_PRECIO, PROMO_WEBHOOK } from "./config.js?v=124";
-import { iniciarPago, iniciarTransferencia } from "./checkout.js?v=124";
-import { tieneTallas, stockDeTalla, stockTotal, precioTalla } from "./tallas.js?v=124";
-import { onMayoreo, precioHTML, precioMay } from "./mayoreo.js?v=124";
-import { track, marcarProducto } from "./track.js?v=124";
-import { codigoDe, ponerCodigo, descuentoCodigo, revalidarCodigos, revisarCodigo } from "./codigos.js?v=124";
-import { promotorPorCodigo } from "./promotor.js?v=124";
+import { ENVIO_DOMICILIO, PERSONALIZACION_PRECIO, PROMO_WEBHOOK } from "./config.js?v=125";
+import { iniciarPago, iniciarTransferencia } from "./checkout.js?v=125";
+import { tieneTallas, stockDeTalla, stockTotal, precioTalla } from "./tallas.js?v=125";
+import { onMayoreo, precioHTML, precioMay } from "./mayoreo.js?v=125";
+import { track, marcarProducto } from "./track.js?v=125";
+import { codigoDe, ponerCodigo, descuentoCodigo, revalidarCodigos, revisarCodigo } from "./codigos.js?v=125";
+import { promotorPorCodigo } from "./promotor.js?v=125";
 const escH = t => String(t ?? "").replace(/[<>&"']/g, c => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;", "'": "&#39;" }[c]));
 
 const CART_KEY = "dm_cart";
