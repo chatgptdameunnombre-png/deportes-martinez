@@ -1,10 +1,11 @@
-import { ENVIO_DOMICILIO, PERSONALIZACION_PRECIO, PROMO_WEBHOOK, NEGOCIO } from "./config.js?v=133";
-import { iniciarPago, iniciarTransferencia } from "./checkout.js?v=133";
-import { tieneTallas, stockDeTalla, stockTotal, precioTalla } from "./tallas.js?v=133";
-import { onMayoreo, precioHTML, precioMay } from "./mayoreo.js?v=133";
-import { track, marcarProducto } from "./track.js?v=133";
-import { codigoDe, ponerCodigo, descuentoCodigo, revalidarCodigos, revisarCodigo } from "./codigos.js?v=133";
-import { promotorPorCodigo } from "./promotor.js?v=133";
+import { ENVIO_DOMICILIO, PERSONALIZACION_PRECIO, PROMO_WEBHOOK, NEGOCIO } from "./config.js?v=134";
+import { iniciarPago, iniciarTransferencia } from "./checkout.js?v=134";
+import { tieneTallas, stockDeTalla, stockTotal, precioTalla } from "./tallas.js?v=134";
+import { onMayoreo, precioHTML, precioMay } from "./mayoreo.js?v=134";
+import { track, marcarProducto } from "./track.js?v=134";
+import { codigoDe, ponerCodigo, descuentoCodigo, revalidarCodigos, revisarCodigo } from "./codigos.js?v=134";
+import { promotorPorCodigo } from "./promotor.js?v=134";
+import { fotoMedia } from "./fotos.js?v=134";
 const escH = t => String(t ?? "").replace(/[<>&"']/g, c => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;", "'": "&#39;" }[c]));
 
 const CART_KEY = "dm_cart";
@@ -98,7 +99,7 @@ export function renderCart() {
   }
   body.innerHTML = items.map(i => `
     <div class="line">
-      <img class="line__img" src="${escH(i.imagen || '')}" alt="" onerror="this.style.visibility='hidden'">
+      <img class="line__img" src="${escH(fotoMedia(i.imagen))}" alt="" onerror="this.style.visibility='hidden'">
       <div class="line__info">
         <div class="line__name">${escH(i.nombre)}${i.talla ? ` <small style="color:#9a9aa2">· Talla ${escH(i.talla)}</small>` : ""}${i.perso ? `<br><small style="color:var(--accent)">${escH(i.perso.nombre || "")}${i.perso.dorsal ? " #" + escH(i.perso.dorsal) : ""} · personalizado</small>` : ""}</div>
         <div class="line__price">${precioHTML(i.precio)}</div>
