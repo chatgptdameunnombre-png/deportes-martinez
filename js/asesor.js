@@ -1,7 +1,7 @@
-import { ASESOR_WEBHOOK, NEGOCIO, firebaseConfig } from "./config.js?v=125";
-import { track } from "./track.js?v=125";
-import { tieneTallas, stockTotal, precioDesde, preciosVarian, precioAntes } from "./tallas.js?v=125";
-import { conectarFormulario, tarjetaSugerenciaHTML } from "./sugerencias.js?v=125";
+import { ASESOR_WEBHOOK, NEGOCIO, firebaseConfig } from "./config.js?v=126";
+import { track } from "./track.js?v=126";
+import { tieneTallas, stockTotal, precioDesde, preciosVarian, precioAntes } from "./tallas.js?v=126";
+import { conectarFormulario, tarjetaSugerenciaHTML } from "./sugerencias.js?v=126";
 const escH = t => String(t ?? "").replace(/[<>&"']/g, c => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;", "'": "&#39;" }[c]));
 
 const money = n => "$" + Number(n).toLocaleString("es-MX");
@@ -16,7 +16,7 @@ function setProductos(list) {
   if (alCargarProductos) alCargarProductos();
 }
 
-import("./catalogo.js?v=125").then(m => m.catalogoRapido(list => setProductos(list))).catch(() => {});
+import("./catalogo.js?v=126").then(m => m.catalogoRapido(list => setProductos(list))).catch(() => {});
 
 function fsVal(v) {
   const t = Object.keys(v)[0];
