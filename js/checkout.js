@@ -1,11 +1,11 @@
-import { AVISO_WEBHOOK, CANCELAR_WEBHOOK, COBRO_WEBHOOK, PEDIDO_WEBHOOK, ENVIO_DOMICILIO, WHATSAPP_NUMERO, NEGOCIO } from "./config.js?v=131";
-const authListo = import("./auth.js?v=131");
-const dbListo = import("./db.js?v=131").then(m => m.db);
+import { AVISO_WEBHOOK, CANCELAR_WEBHOOK, COBRO_WEBHOOK, PEDIDO_WEBHOOK, ENVIO_DOMICILIO, WHATSAPP_NUMERO, NEGOCIO } from "./config.js?v=132";
+const authListo = import("./auth.js?v=132");
+const dbListo = import("./db.js?v=132").then(m => m.db);
 const abrirLogin = (...a) => authListo.then(m => m.abrirLogin(...a));
 let db = null;
-import { esMayorista as soyMayorista } from "./mayoreo.js?v=131";
-import { track } from "./track.js?v=131";
-import { campoTelefono, conectarTelefono, leerTelefono } from "./telefono.js?v=131";
+import { esMayorista as soyMayorista } from "./mayoreo.js?v=132";
+import { track } from "./track.js?v=132";
+import { campoTelefono, conectarTelefono, leerTelefono } from "./telefono.js?v=132";
 const escH = t => String(t ?? "").replace(/[<>&"']/g, c => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;", "'": "&#39;" }[c]));
 
 const money = n => "$" + Number(n).toLocaleString("es-MX");
@@ -163,7 +163,7 @@ async function mostrarClabe({ productos, entrega, total, cliente, telefono, dire
   const paso1 = `
     <div style="${caja}">
       ${cab("Paga por transferencia")}
-      <p style="margin:0 0 14px;font-size:15.5px;line-height:1.5;color:#9a9aa2">Transfiere el monto a esta cuenta. Tu playera queda apartada 48 horas. Si te equivocaste, cierra con la ✕ y se cancela.</p>
+      <p style="margin:0 0 14px;font-size:15.5px;line-height:1.5;color:#9a9aa2">Transfiere el monto a esta cuenta. Te apartamos tu playera 2 horas para que transfieras; al dar «Ya transferí» te la guardamos 48 horas. Si te equivocaste, cierra con la ✕ y se cancela.</p>
       ${datosBanco}
       <p style="margin:0 0 10px;font-size:17px;line-height:1.45;color:#f4f4f5;font-weight:700">Una vez terminada la transferencia, da clic aquí:</p>
       <button type="button" id="trYa" style="${oro}">Ya transferí</button>
@@ -228,7 +228,13 @@ async function mostrarClabe({ productos, entrega, total, cliente, telefono, dire
       const btn = q("#trYa");
       btn.disabled = true; btn.textContent = "Avisando…";
       const idToken = await dbListo.then(d => d.token()).catch(() => null);
-      fetch(AVISO_WEBHOOK, { method: "POST", headers: { "Content-Type": "application/json" }, keepalive: true, body: JSON.stringify({ tipo: "transferi", id: r.id, idToken }) }).catch(() => {});
+      const listo = await fetch(AVISO_WEBHOOK, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ tipo: "transferi", id: r.id, idToken }) })
+        .then(x => x.ok ? x.json() : null).then(x => !!(x && x.ok)).catch(() => false);
+      if (!listo) {
+        btn.disabled = false; btn.textContent = "Ya transferí";
+        alert("No pudimos avisar a la tienda. Revisa tu internet y vuelve a dar clic en «Ya transferí». Tu playera sigue apartada.");
+        return;
+      }
       track("ya_transferi", { ref, total: totalFinal });
       paso = 2;
       pintar();
