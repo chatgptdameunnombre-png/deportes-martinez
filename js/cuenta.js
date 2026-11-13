@@ -1,6 +1,6 @@
-import { db } from "./db.js?v=128";
-import { WHATSAPP_NUMERO, BORRAR_CUENTA_WEBHOOK } from "./config.js?v=128";
-import { campoTelefono, conectarTelefono, ponerTelefono, leerTelefono } from "./telefono.js?v=128";
+import { db } from "./db.js?v=129";
+import { WHATSAPP_NUMERO, BORRAR_CUENTA_WEBHOOK } from "./config.js?v=129";
+import { campoTelefono, conectarTelefono, ponerTelefono, leerTelefono } from "./telefono.js?v=129";
 const cajaTel = document.getElementById("fTelCaja");
 if (cajaTel) { cajaTel.innerHTML = campoTelefono("fTel", "padding:12px 14px;border-radius:11px;border:1px solid #2a2a30;background:#0e0e11;color:#f4f4f5;font-size:16px;outline:none;box-sizing:border-box"); conectarTelefono(document, "fTel"); }
 const escH = t => String(t ?? "").replace(/[<>&"']/g, c => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -77,6 +77,7 @@ const PASOS = {
 
 function estadoDe(v) {
   const base = PASOS[v.estado] || PASOS.pagada;
+  if (v.estado === "por_cobrar" && v.avisoTransferencia) return { ...base, txt: "Validando pago", nota: "Ya te apartamos el jersey. Estamos validando tu transferencia y te avisamos por WhatsApp en cuanto se confirme." };
   if (v.estado === "entregada" && v.entrega === "domicilio") return { ...base, txt: "Enviado" };
   return base;
 }
@@ -104,7 +105,7 @@ function barraPasos(v) {
   const ahora = hechos.indexOf(false);
   return `<ol class="mc-pasos">${pasos.map(([t, f], i) => {
     const cls = hechos[i] ? "hecho" : (i === ahora ? "ahora" : "");
-    const fecha = hechos[i] ? cuando(f, true) : (i === ahora ? (i === 0 ? "Esperando tu pago" : (casa ? "Lo estamos preparando" : "Te esperamos")) : "Pendiente");
+    const fecha = hechos[i] ? cuando(f, true) : (i === ahora ? (i === 0 ? (v.avisoTransferencia ? "Validando pago" : "Esperando tu pago") : (casa ? "Lo estamos preparando" : "Te esperamos")) : "Pendiente");
     return `<li class="mc-paso ${cls}"><span class="mc-paso__bola">${hechos[i] ? "✓" : i + 1}</span><span class="mc-paso__txt">${t}</span><span class="mc-paso__fecha">${fecha}</span></li>`;
   }).join("")}</ol>`;
 }
