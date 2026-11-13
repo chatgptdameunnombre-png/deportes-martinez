@@ -1,10 +1,10 @@
-import { ENVIO_DOMICILIO, PERSONALIZACION_PRECIO, PROMO_WEBHOOK } from "./config.js?v=125";
-import { iniciarPago, iniciarTransferencia } from "./checkout.js?v=125";
-import { tieneTallas, stockDeTalla, stockTotal, precioTalla } from "./tallas.js?v=125";
-import { onMayoreo, precioHTML, precioMay } from "./mayoreo.js?v=125";
-import { track, marcarProducto } from "./track.js?v=125";
-import { codigoDe, ponerCodigo, descuentoCodigo, revalidarCodigos, revisarCodigo } from "./codigos.js?v=125";
-import { promotorPorCodigo } from "./promotor.js?v=125";
+import { ENVIO_DOMICILIO, PERSONALIZACION_PRECIO, PROMO_WEBHOOK, NEGOCIO } from "./config.js?v=126";
+import { iniciarPago, iniciarTransferencia } from "./checkout.js?v=126";
+import { tieneTallas, stockDeTalla, stockTotal, precioTalla } from "./tallas.js?v=126";
+import { onMayoreo, precioHTML, precioMay } from "./mayoreo.js?v=126";
+import { track, marcarProducto } from "./track.js?v=126";
+import { codigoDe, ponerCodigo, descuentoCodigo, revalidarCodigos, revisarCodigo } from "./codigos.js?v=126";
+import { promotorPorCodigo } from "./promotor.js?v=126";
 const escH = t => String(t ?? "").replace(/[<>&"']/g, c => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;", "'": "&#39;" }[c]));
 
 const CART_KEY = "dm_cart";
@@ -127,6 +127,7 @@ export function renderCart() {
     const fila = $("#cartDesc");
     if (fila) fila.hidden = true;
   }
+  document.querySelectorAll("#cartFoot .mapa-tienda").forEach(a => { a.hidden = entrega !== "tienda"; });
   document.querySelectorAll(".entrega-cart").forEach(b => {
     const on = b.dataset.ec === entrega;
     b.style.borderColor = on ? "#e8b923" : "#2a2a32";
@@ -309,6 +310,7 @@ export function initCart() {
     wrap.style.cssText = "display:flex;gap:8px;margin-bottom:12px";
     wrap.innerHTML = `<button type="button" class="entrega-cart" data-ec="tienda" style="flex:1;padding:10px;border-radius:10px;border:1px solid #2a2a32;background:#141418;color:#f4f4f5;font-size:12.5px;cursor:pointer">Recoger en tienda</button><button type="button" class="entrega-cart" data-ec="domicilio" style="flex:1;padding:10px;border-radius:10px;border:1px solid #2a2a32;background:#141418;color:#f4f4f5;font-size:12.5px;cursor:pointer">🏠 A domicilio +${money(ENVIO_DOMICILIO)}</button>`;
     foot.prepend(wrap);
+    wrap.insertAdjacentHTML("afterend", `<a class="mapa-tienda" href="${NEGOCIO.mapa}" target="_blank" rel="noopener" hidden>📍 Cómo llegar a la tienda</a>`);
   }
   if (foot && !$("#pagoCart")) {
     const w2 = document.createElement("div");
