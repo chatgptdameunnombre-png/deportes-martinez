@@ -1,11 +1,11 @@
-import { AVISO_WEBHOOK, CANCELAR_WEBHOOK, COBRO_WEBHOOK, PEDIDO_WEBHOOK, ENVIO_DOMICILIO, WHATSAPP_NUMERO, NEGOCIO } from "./config.js?v=128";
-const authListo = import("./auth.js?v=128");
-const dbListo = import("./db.js?v=128").then(m => m.db);
+import { AVISO_WEBHOOK, CANCELAR_WEBHOOK, COBRO_WEBHOOK, PEDIDO_WEBHOOK, ENVIO_DOMICILIO, WHATSAPP_NUMERO, NEGOCIO } from "./config.js?v=129";
+const authListo = import("./auth.js?v=129");
+const dbListo = import("./db.js?v=129").then(m => m.db);
 const abrirLogin = (...a) => authListo.then(m => m.abrirLogin(...a));
 let db = null;
-import { esMayorista as soyMayorista } from "./mayoreo.js?v=128";
-import { track } from "./track.js?v=128";
-import { campoTelefono, conectarTelefono, leerTelefono } from "./telefono.js?v=128";
+import { esMayorista as soyMayorista } from "./mayoreo.js?v=129";
+import { track } from "./track.js?v=129";
+import { campoTelefono, conectarTelefono, leerTelefono } from "./telefono.js?v=129";
 const escH = t => String(t ?? "").replace(/[<>&"']/g, c => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;", "'": "&#39;" }[c]));
 
 const money = n => "$" + Number(n).toLocaleString("es-MX");
@@ -179,8 +179,6 @@ async function mostrarClabe({ productos, entrega, total, cliente, telefono, dire
         ${fila("Monto", `<b style="color:#e8b923;font-size:21px">${money(totalFinal)}</b>`)}
         ${pedidoNum}
       </div>
-      <button type="button" id="trVerDatos" style="display:block;width:100%;margin:0 0 12px;background:none;border:1px solid #2e2e38;color:#f4f4f5;border-radius:12px;padding:12px;font-weight:700;font-size:15.5px;cursor:pointer;font-family:inherit">Ver datos de transferencia</button>
-      <div id="trDatos" hidden>${datosBanco}</div>
       <p style="margin:0 0 4px;font-size:14.5px;line-height:1.5;color:#9a9aa2">Cuando confirmemos tu pago te avisamos por WhatsApp. Si en 48 horas no recibimos el comprobante, liberamos la playera.</p>
       ${entrega === "domicilio" ? "" : `<a href="${rutaMapa()}" target="_blank" rel="noopener" style="display:block;text-align:center;margin-top:10px;border:1px solid #2e2e38;color:#f4f4f5;border-radius:12px;padding:13px;font-weight:700;font-size:16px;text-decoration:none">📍 Cómo llegar a la tienda</a>`}
       <p style="margin:14px 0 0;font-size:15px;line-height:1.55;color:${invitado ? "#f7d154" : "#9a9aa2"}">${invitado
@@ -222,13 +220,6 @@ async function mostrarClabe({ productos, entrega, total, cliente, telefono, dire
       btnCopy.textContent = "Copiado ✓";
     };
     if (paso === 2) {
-      q("#trVerDatos").onclick = () => {
-        const d = q("#trDatos"), abrir = d.hidden;
-        d.hidden = !abrir;
-        q("#trVerDatos").textContent = abrir ? "Ocultar datos de transferencia" : "Ver datos de transferencia";
-        const c = q("#trDatos #trCopy");
-        if (c) c.onclick = () => { navigator.clipboard?.writeText(CLABE_TRANSFERENCIA.replace(/\s/g, "")); c.textContent = "Copiado ✓"; };
-      };
       ov.querySelector('a[href*="wa.me"]')?.addEventListener("click", () => track("comprobante_whatsapp", { ref, total: totalFinal }));
       return;
     }
