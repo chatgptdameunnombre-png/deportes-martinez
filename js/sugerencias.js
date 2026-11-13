@@ -3,7 +3,7 @@
    Escribe directo a Firestore: la regla deja crear a cualquiera pero solo el
    dueño puede leer, y ahí mismo se valida el tope de 200 caracteres. */
 
-import { firebaseConfig, AVISO_WEBHOOK } from "./config.js?v=126";
+import { firebaseConfig, AVISO_WEBHOOK } from "./config.js?v=127";
 
 const PROJ = firebaseConfig.projectId;
 const KEY = firebaseConfig.apiKey;
