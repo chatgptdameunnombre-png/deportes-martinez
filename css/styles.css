@@ -1913,3 +1913,10 @@ a.proxi-card:hover { transform: translateY(-4px); border-color: var(--accent); }
   .prm__card { grid-template-columns: 1fr; }
   .prm__acc { justify-content: flex-start; }
 }
+
+.liga-head__esc.on { transform: scale(1.12); }
+.liga-head__esc.on img { filter: drop-shadow(0 0 10px rgba(232,185,35,.75)) drop-shadow(0 4px 12px rgba(0,0,0,.5)); }
+.liga-head--filtro .liga-head__esc:not(.on) { opacity: .45; }
+.liga-head--filtro .liga-head__esc:not(.on):hover { opacity: 1; }
+.acc--activo .acc__h { color: var(--accent); }
+.acc--activo .acc__h .arr { color: var(--accent); }
