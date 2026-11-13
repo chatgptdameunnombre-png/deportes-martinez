@@ -1,5 +1,5 @@
-import { promotorActual, promoVigente } from "./promotor.js?v=127";
-import { PROMO_WEBHOOK } from "./config.js?v=127";
+import { promotorActual, promoVigente } from "./promotor.js?v=128";
+import { PROMO_WEBHOOK } from "./config.js?v=128";
 
 const KEY = "dm_codigos";
 const VIDA = 2 * 24 * 3600 * 1000;
