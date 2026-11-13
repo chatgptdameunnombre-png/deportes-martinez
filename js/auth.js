@@ -1,6 +1,6 @@
-import { esperaRestante, anotaFallo, limpiaFallos, esFalloDeClave, textoEspera } from "./clave-segura.js?v=136";
-import { db } from "./db.js?v=136";
-import { EDAD_MINIMA } from "./config.js?v=136";
+import { esperaRestante, anotaFallo, limpiaFallos, esFalloDeClave, textoEspera } from "./clave-segura.js?v=137";
+import { db } from "./db.js?v=137";
+import { EDAD_MINIMA } from "./config.js?v=137";
 
 const OWNER_EMAILS = ["admindeportesmartinez@gmail.com"];
 const esDueno = u => !!u && OWNER_EMAILS.includes((u.email || "").toLowerCase());
@@ -300,19 +300,25 @@ else document.addEventListener("DOMContentLoaded", init);
 function aplicarUsuario(u) {
   currentUser = u;
   updateButton();
-  import("./track.js?v=136").then(t => t.setCliente(u?.uid || "", u?.email || "")).catch(() => {});
+  import("./track.js?v=137").then(t => t.setCliente(u?.uid || "", u?.email || "")).catch(() => {});
 }
 
-db.onAuth(u => aplicarUsuario(u));
+/* Firebase (~170 KB) baja cuando la página ya se ve, no antes. */
+function arrancarSesion() {
+  db.onAuth(u => aplicarUsuario(u));
 
-/* Red de seguridad para Safari: si el aviso de Firebase no llegó pero la sesión
-   sí está puesta, se pinta igual. Se revisa un par de veces y se deja de insistir. */
-let intentos = 0;
-const revisar = setInterval(() => {
-  intentos++;
-  const u = db.usuarioAhora?.();
-  if (u && !currentUser) aplicarUsuario(u);
-  if (intentos >= 6 || (u && currentUser)) clearInterval(revisar);
-}, 700);
+  /* Red de seguridad para Safari: si el aviso de Firebase no llegó pero la sesión
+     sí está puesta, se pinta igual. Se revisa un par de veces y se deja de insistir. */
+  let intentos = 0;
+  const revisar = setInterval(() => {
+    intentos++;
+    const u = db.usuarioAhora?.();
+    if (u && !currentUser) aplicarUsuario(u);
+    if (intentos >= 6 || (u && currentUser)) clearInterval(revisar);
+  }, 700);
+}
+const despues = () => ("requestIdleCallback" in window ? requestIdleCallback(arrancarSesion, { timeout: 2000 }) : setTimeout(arrancarSesion, 300));
+if (document.readyState === "complete") despues();
+else addEventListener("load", despues, { once: true });
 
 export { currentUser, openModal as abrirLogin };
