@@ -1,10 +1,11 @@
-import { COBRO_WEBHOOK, PEDIDO_WEBHOOK, ENVIO_DOMICILIO, WHATSAPP_NUMERO, NEGOCIO } from "./config.js?v=125";
-const authListo = import("./auth.js?v=125");
-const dbListo = import("./db.js?v=125").then(m => m.db);
+import { CANCELAR_WEBHOOK, COBRO_WEBHOOK, PEDIDO_WEBHOOK, ENVIO_DOMICILIO, WHATSAPP_NUMERO, NEGOCIO } from "./config.js?v=126";
+const authListo = import("./auth.js?v=126");
+const dbListo = import("./db.js?v=126").then(m => m.db);
 const abrirLogin = (...a) => authListo.then(m => m.abrirLogin(...a));
 let db = null;
-import { esMayorista as soyMayorista } from "./mayoreo.js?v=125";
-import { track } from "./track.js?v=125";
+import { esMayorista as soyMayorista } from "./mayoreo.js?v=126";
+import { track } from "./track.js?v=126";
+import { campoTelefono, conectarTelefono, leerTelefono } from "./telefono.js?v=126";
 const escH = t => String(t ?? "").replace(/[<>&"']/g, c => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;", "'": "&#39;" }[c]));
 
 const money = n => "$" + Number(n).toLocaleString("es-MX");
@@ -172,6 +173,7 @@ async function mostrarClabe({ productos, entrega, total, cliente, telefono, dire
       <p style="margin:14px 0 0;font-size:15px;line-height:1.55;color:${invitado ? "#f7d154" : "#9a9aa2"}">${invitado
         ? `Guarda tu número de pedido <b>${ref}</b>: cópialo o tómale captura. Como compraste sin cuenta, no lo vas a poder ver después en la página.`
         : `Puedes seguir tu pedido paso a paso en <a href="cuenta.html" style="color:#e8b923">Mi cuenta</a>.`}</p>
+      <button type="button" id="trCancelar" style="display:block;width:100%;margin-top:14px;background:none;border:1px solid #3a2a2a;color:#ff9b9b;border-radius:12px;padding:12px;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit">↩ Me equivoqué: cancelar este pedido y empezar de nuevo</button>
     </div>`;
   document.body.appendChild(ov);
   const q = s => ov.querySelector(s);
@@ -184,6 +186,25 @@ async function mostrarClabe({ productos, entrega, total, cliente, telefono, dire
   };
   q("#trClose").onclick = cerrar;
   ov.addEventListener("click", e => { if (e.target === ov) cerrar(); });
+  q("#trCancelar").onclick = async () => {
+    if (!confirm(`¿Cancelar el pedido ${ref}? La playera vuelve a la tienda y puedes hacerlo otra vez.`)) return;
+    const btn = q("#trCancelar");
+    btn.disabled = true; btn.textContent = "Cancelando…";
+    const idToken = await dbListo.then(d => d.token()).catch(() => null);
+    const res = await fetch(CANCELAR_WEBHOOK, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: r.id, idToken })
+    }).then(x => x.json()).catch(() => ({ ok: false, motivo: "red" }));
+    if (res.ok) {
+      track("transferencia_cancelada_cliente", { ref });
+      ov.remove();
+      const a = aviso(`Listo, cancelamos el pedido ${ref} y la playera volvió a la tienda. Ya puedes hacerlo otra vez.`);
+      a.style.cursor = "pointer"; a.onclick = () => a.remove(); setTimeout(() => a.remove(), 6000);
+      return;
+    }
+    btn.disabled = false; btn.textContent = "↩ Me equivoqué: cancelar este pedido y empezar de nuevo";
+    alert(res.motivo === "ya no se puede" ? "Este pedido ya no se puede cancelar desde aquí. Escríbenos por WhatsApp." : "No se pudo cancelar. Revisa tu internet e inténtalo otra vez.");
+  };
   ov.querySelector('a[href*="wa.me"]')?.addEventListener("click", () => {
     track("comprobante_whatsapp", { ref, total: totalFinal });
   });
@@ -326,7 +347,7 @@ function abrirModal(entrega, onConfirm, onCancel) {
         : "Recoges en la tienda. Necesitamos tu nombre y teléfono para avisarte cuando esté listo."}</p>
       <div style="display:flex;flex-direction:column;gap:10px">
         <input id="dNombre" placeholder="Nombre completo" ${inp()}>
-        <input id="dTel" placeholder="Teléfono" inputmode="tel" ${inp()}>
+        ${campoTelefono("dTel", inpBase())}
         ${aDomicilio ? `
         <input id="dCalle" placeholder="Calle y número" ${inp()}>
         <div style="display:flex;gap:10px">
@@ -347,16 +368,18 @@ function abrirModal(entrega, onConfirm, onCancel) {
   document.body.appendChild(ov);
   const $ = s => ov.querySelector(s);
   if (perfil) {
-    const pre = { dNombre: perfil.nombre, dTel: perfil.telefono, dCalle: perfil.calle, dCol: perfil.colonia, dCP: perfil.cp, dCiudad: perfil.ciudad, dEstado: perfil.estado, dRef: perfil.referencias };
+    const pre = { dNombre: perfil.nombre, dCalle: perfil.calle, dCol: perfil.colonia, dCP: perfil.cp, dCiudad: perfil.ciudad, dEstado: perfil.estado, dRef: perfil.referencias };
     for (const [id, v] of Object.entries(pre)) { const el = $("#" + id); if (v && el) el.value = v; }
   }
+  conectarTelefono(ov, "dTel", perfil?.telefono || "");
   const cerrar = () => { ov.remove(); if (onCancel) onCancel(); };
   $("#dirClose").onclick = cerrar;
   ov.addEventListener("click", e => { if (e.target === ov) cerrar(); });
   $("#dGo").onclick = () => {
     const v = id => { const el = $("#" + id); return el ? el.value.trim() : ""; };
-    const nombre = v("dNombre"), tel = v("dTel");
-    if (!nombre || !telValido(tel)) { $("#dErr").textContent = "Pon tu nombre y tu WhatsApp: 10 dígitos, o con + y la lada si es de otro país."; return; }
+    const nombre = v("dNombre"), lt = leerTelefono(ov, "dTel"), tel = lt.valor;
+    if (!nombre) { $("#dErr").textContent = "Pon tu nombre."; return; }
+    if (!lt.ok) { $("#dErr").textContent = lt.error; return; }
     const calle = v("dCalle"), col = v("dCol"), cp = v("dCP"), ciudad = v("dCiudad"), estado = v("dEstado"), ref = v("dRef");
     if (aDomicilio && (!calle || !col || !cp || !ciudad || !estado)) { $("#dErr").textContent = "Completa calle, colonia, C.P., ciudad y estado."; return; }
     const direccion = aDomicilio ? `${calle}, Col. ${col}, ${ciudad}, ${estado}, C.P. ${cp}${ref ? " (" + ref + ")" : ""}` : "";
