@@ -1,11 +1,11 @@
-import { catalogoRapido, guardarCatalogo } from "./catalogo.js?v=136";
-import { setProductos, initCart, enCarrito } from "./cart.js?v=136";
-import { tieneTallas, stockTotal, precioDesde, preciosVarian, etiquetaStock, tallasDisponibles, precioAntes } from "./tallas.js?v=136";
-import { onMayoreo, precioHTML } from "./mayoreo.js?v=136";
-import { track } from "./track.js?v=136";
-import { tarjetaSugerenciaHTML, conectarFormulario } from "./sugerencias.js?v=136";
-import { ESCUDOS } from "./escudos.js?v=136";
-import { fotoMedia } from "./fotos.js?v=136";
+import { catalogoRapido, guardarCatalogo } from "./catalogo.js?v=137";
+import { setProductos, initCart, enCarrito } from "./cart.js?v=137";
+import { tieneTallas, stockTotal, precioDesde, preciosVarian, etiquetaStock, tallasDisponibles, precioAntes } from "./tallas.js?v=137";
+import { onMayoreo, precioHTML } from "./mayoreo.js?v=137";
+import { track } from "./track.js?v=137";
+import { tarjetaSugerenciaHTML, conectarFormulario } from "./sugerencias.js?v=137";
+import { ESCUDOS } from "./escudos.js?v=137";
+import { fotoMedia } from "./fotos.js?v=137";
 
 const $ = s => document.querySelector(s);
 const CAT = document.querySelector("#catalogo")?.dataset.categoria || null;
@@ -26,6 +26,13 @@ let f = {
   orden: "rel"
 };
 let q = qs.get("q") || "";
+
+function urlFiltros() {
+  const u = new URL(location.href);
+  const EN_URL = [["version", "sub", "Todas"], ["liga", "liga", "Todas"], ["equipo", "equipo", "Todos"], ["marca", "marca", "Todas"], ["color", "color", "Todos"]];
+  for (const [par, k, ini] of EN_URL) f[k] !== ini ? u.searchParams.set(par, f[k]) : u.searchParams.delete(par);
+  history.replaceState(null, "", u);
+}
 let qTimer, renderTimer;
 
 const norm = t => String(t || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
@@ -234,7 +241,7 @@ function porLigas(lista) {
   const ligas = [...grupos.keys()].sort((a, b) => pos(a) - pos(b) || a.localeCompare(b));
   return ligas.map(l => {
     const ps = grupos.get(l).sort(ordenEquipo);
-    const deLiga = f.equipo !== "Todos" ? base().filter(p => p.liga === l).sort(ordenEquipo) : ps;
+    const deLiga = f.equipo !== "Todos" ? base().filter(p => (p.liga || "Otros") === l).sort(ordenEquipo) : ps;
     const equipos = [...new Set(deLiga.map(p => p.equipo).filter(e => ESCUDOS[e]))];
     const mitad = Math.ceil(equipos.length / 2);
     const izq = equipos.slice(0, mitad).map(escudoHTML).join("");
@@ -429,6 +436,7 @@ document.addEventListener("click", e => {
   if (escudo) {
     f.equipo = f.equipo === escudo.dataset.escudo ? "Todos" : escudo.dataset.escudo;
     track("filtro", { categoria: CAT, campo: "equipo", campoTxt: "equipo", valor: f.equipo });
+    urlFiltros();
     render();
     $("#catalogo")?.scrollIntoView({ behavior: "smooth", block: "start" });
     return;
@@ -438,6 +446,7 @@ document.addEventListener("click", e => {
     f[opt.dataset.f] = opt.dataset.v;
     const NOMBRE_F = { sub: "versión", liga: "liga", equipo: "equipo", temporada: "temporada", marca: "marca", talla: "talla", color: "color", orden: "orden" };
     track("filtro", { categoria: CAT, campo: opt.dataset.f, campoTxt: NOMBRE_F[opt.dataset.f] || opt.dataset.f, valor: opt.dataset.v });
+    urlFiltros();
     render();
     return;
   }
