@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Manrope:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
 
 /* ============================================================
    Deportes Martinez — tema oscuro premium (dorado / azul marino)
@@ -37,7 +36,7 @@
 /* marca de agua del escudo, como en su Instagram */
 body::before {
   content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
-  background: url('../fotos/logo/logo-cuadrado.webp') center / min(520px, 62vw) no-repeat;
+  background: url('../fotos/logo/logo-fondo.webp') center / min(520px, 62vw) no-repeat;
   opacity: .028;
 }
 
