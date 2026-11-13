@@ -1,6 +1,6 @@
-import { db } from "./db.js?v=131";
-import { WHATSAPP_NUMERO, BORRAR_CUENTA_WEBHOOK } from "./config.js?v=131";
-import { campoTelefono, conectarTelefono, ponerTelefono, leerTelefono } from "./telefono.js?v=131";
+import { db } from "./db.js?v=132";
+import { WHATSAPP_NUMERO, BORRAR_CUENTA_WEBHOOK } from "./config.js?v=132";
+import { campoTelefono, conectarTelefono, ponerTelefono, leerTelefono } from "./telefono.js?v=132";
 const cajaTel = document.getElementById("fTelCaja");
 if (cajaTel) { cajaTel.innerHTML = campoTelefono("fTel", "padding:12px 14px;border-radius:11px;border:1px solid #2a2a30;background:#0e0e11;color:#f4f4f5;font-size:16px;outline:none;box-sizing:border-box"); conectarTelefono(document, "fTel"); }
 const escH = t => String(t ?? "").replace(/[<>&"']/g, c => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -124,7 +124,7 @@ async function pintarCompras(uid) {
   const cont = document.getElementById("misCompras");
   if (!cont) return;
   try {
-    const compras = await db.misCompras(uid);
+    const compras = (await db.misCompras(uid)).filter(v => v.estado !== "procesando");
     if (!compras.length) {
       cont.innerHTML = `<div class="mc-vacio">
         <b>Todavía no has pedido nada</b>
