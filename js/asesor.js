@@ -1,7 +1,8 @@
-import { ASESOR_WEBHOOK, NEGOCIO, firebaseConfig } from "./config.js?v=133";
-import { track } from "./track.js?v=133";
-import { tieneTallas, stockTotal, precioDesde, preciosVarian, precioAntes } from "./tallas.js?v=133";
-import { conectarFormulario, tarjetaSugerenciaHTML } from "./sugerencias.js?v=133";
+import { ASESOR_WEBHOOK, NEGOCIO, firebaseConfig } from "./config.js?v=134";
+import { track } from "./track.js?v=134";
+import { tieneTallas, stockTotal, precioDesde, preciosVarian, precioAntes } from "./tallas.js?v=134";
+import { conectarFormulario, tarjetaSugerenciaHTML } from "./sugerencias.js?v=134";
+import { fotoMedia } from "./fotos.js?v=134";
 const escH = t => String(t ?? "").replace(/[<>&"']/g, c => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;", "'": "&#39;" }[c]));
 
 const money = n => "$" + Number(n).toLocaleString("es-MX");
@@ -16,7 +17,7 @@ function setProductos(list) {
   if (alCargarProductos) alCargarProductos();
 }
 
-import("./catalogo.js?v=133").then(m => m.catalogoRapido(list => setProductos(list))).catch(() => {});
+import("./catalogo.js?v=134").then(m => m.catalogoRapido(list => setProductos(list))).catch(() => {});
 
 function fsVal(v) {
   const t = Object.keys(v)[0];
@@ -153,7 +154,7 @@ function montar() {
       const sized = tieneTallas(p);
       const precioTxt = (precioAntes(p) ? `<s class="precio-antes">${money(precioAntes(p))}</s> ` : "") + (preciosVarian(p) ? `desde ${money(precioDesde(p))}` : money(precioDesde(p)));
       const foto = p.imagen
-        ? `<img src="${escH(p.imagen)}" alt="${escH(p.nombre)}" onerror="this.style.display='none'">`
+        ? `<img src="${escH(fotoMedia(p.imagen))}" alt="${escH(p.nombre)}" onerror="this.style.display='none'">`
         : `<div class="ac-ph">📷</div>`;
       const accion = sinStock
         ? `<button class="ac-add" type="button" disabled>Agotado</button>`
