@@ -1,4 +1,4 @@
-import { firebaseConfig } from "./config.js?v=124";
+import { firebaseConfig } from "./config.js?v=125";
 
 const DOCS = `https://firestore.googleapis.com/v1/projects/${firebaseConfig.projectId}/databases/(default)/documents/`;
 const KEY = "dm_catalogo_v1";
@@ -76,6 +76,15 @@ export async function catalogoRapido(cb) {
     const lista = await pedido;
     if (lista && (!c || JSON.stringify(c) !== JSON.stringify(lista))) cb(lista);
   } catch {}
+}
+
+export async function productoRapido(id) {
+  try {
+    const r = await fetch(`${DOCS}productos/${encodeURIComponent(id)}?key=${firebaseConfig.apiKey}`);
+    if (!r.ok) return null;
+    const d = await r.json();
+    return d.fields ? { ...campos(d.fields), id } : null;
+  } catch { return null; }
 }
 
 export async function fotosRapido(id) {
