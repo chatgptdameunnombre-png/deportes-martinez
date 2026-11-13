@@ -1,12 +1,12 @@
-import { catalogoRapido, fotosRapido, guardarCatalogo, productoRapido } from "./catalogo.js?v=127";
-import { setProductos, initCart, enCarrito, addCart } from "./cart.js?v=127";
-import { ENVIO_DOMICILIO, PERSONALIZACION_PRECIO, PROMO_WEBHOOK, NEGOCIO } from "./config.js?v=127";
-import { iniciarPago, iniciarTransferencia } from "./checkout.js?v=127";
-import { tieneTallas, tallasDe, stockDeTalla, stockTotal, precioTalla, precioDesde, preciosVarian, etiquetaStock, precioAntes } from "./tallas.js?v=127";
-import { onMayoreo, precioHTML, precioMay } from "./mayoreo.js?v=127";
-import { track, trackProducto, cerrarProducto } from "./track.js?v=127";
-import { promotorPorCodigo } from "./promotor.js?v=127";
-import { codigoDe, ponerCodigo, descuentoCodigo, revalidarCodigos } from "./codigos.js?v=127";
+import { catalogoRapido, fotosRapido, guardarCatalogo, productoRapido } from "./catalogo.js?v=128";
+import { setProductos, initCart, enCarrito, addCart } from "./cart.js?v=128";
+import { ENVIO_DOMICILIO, PERSONALIZACION_PRECIO, PROMO_WEBHOOK, NEGOCIO } from "./config.js?v=128";
+import { iniciarPago, iniciarTransferencia } from "./checkout.js?v=128";
+import { tieneTallas, tallasDe, stockDeTalla, stockTotal, precioTalla, precioDesde, preciosVarian, etiquetaStock, precioAntes } from "./tallas.js?v=128";
+import { onMayoreo, precioHTML, precioMay } from "./mayoreo.js?v=128";
+import { track, trackProducto, cerrarProducto } from "./track.js?v=128";
+import { promotorPorCodigo } from "./promotor.js?v=128";
+import { codigoDe, ponerCodigo, descuentoCodigo, revalidarCodigos } from "./codigos.js?v=128";
 const escH = t => String(t ?? "").replace(/[<>&"']/g, c => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;", "'": "&#39;" }[c]));
 
 const $ = s => document.querySelector(s);
@@ -40,11 +40,12 @@ function recibir(list) {
   productos = list;
   setProductos(list);
   render();
-  if (id && !buscadoSolo && list.length && !list.some(x => x.id === id)) {
+  if (id && !buscadoSolo && list.length) {
     buscadoSolo = true;
     productoRapido(id).then(p => {
-      if (!p || p.oculto || productos.some(x => x.id === id)) return;
-      productos = [...productos, p];
+      if (!p) return;
+      const otros = productos.filter(x => x.id !== id);
+      productos = p.oculto ? otros : [...otros, p];
       setProductos(productos);
       render();
     });
@@ -498,7 +499,7 @@ function ponerDatosParaGoogle(p, precio, stock) {
 const escA = t => String(t ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
 async function abrirAviso(p) {
-  const { conectarFormulario } = await import("./sugerencias.js?v=127");
+  const { conectarFormulario } = await import("./sugerencias.js?v=128");
   document.getElementById("avisoModal")?.remove();
   const m = document.createElement("div");
   m.className = "aviso-modal";
