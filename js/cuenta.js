@@ -1,6 +1,6 @@
-import { db } from "./db.js?v=132";
-import { WHATSAPP_NUMERO, BORRAR_CUENTA_WEBHOOK } from "./config.js?v=132";
-import { campoTelefono, conectarTelefono, ponerTelefono, leerTelefono } from "./telefono.js?v=132";
+import { db } from "./db.js?v=133";
+import { WHATSAPP_NUMERO, BORRAR_CUENTA_WEBHOOK } from "./config.js?v=133";
+import { campoTelefono, conectarTelefono, ponerTelefono, leerTelefono } from "./telefono.js?v=133";
 const cajaTel = document.getElementById("fTelCaja");
 if (cajaTel) { cajaTel.innerHTML = campoTelefono("fTel", "padding:12px 14px;border-radius:11px;border:1px solid #2a2a30;background:#0e0e11;color:#f4f4f5;font-size:16px;outline:none;box-sizing:border-box"); conectarTelefono(document, "fTel"); }
 const escH = t => String(t ?? "").replace(/[<>&"']/g, c => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;", "'": "&#39;" }[c]));
