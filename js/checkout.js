@@ -1,11 +1,11 @@
-import { CANCELAR_WEBHOOK, COBRO_WEBHOOK, PEDIDO_WEBHOOK, ENVIO_DOMICILIO, WHATSAPP_NUMERO, NEGOCIO } from "./config.js?v=126";
-const authListo = import("./auth.js?v=126");
-const dbListo = import("./db.js?v=126").then(m => m.db);
+import { AVISO_WEBHOOK, CANCELAR_WEBHOOK, COBRO_WEBHOOK, PEDIDO_WEBHOOK, ENVIO_DOMICILIO, WHATSAPP_NUMERO, NEGOCIO } from "./config.js?v=127";
+const authListo = import("./auth.js?v=127");
+const dbListo = import("./db.js?v=127").then(m => m.db);
 const abrirLogin = (...a) => authListo.then(m => m.abrirLogin(...a));
 let db = null;
-import { esMayorista as soyMayorista } from "./mayoreo.js?v=126";
-import { track } from "./track.js?v=126";
-import { campoTelefono, conectarTelefono, leerTelefono } from "./telefono.js?v=126";
+import { esMayorista as soyMayorista } from "./mayoreo.js?v=127";
+import { track } from "./track.js?v=127";
+import { campoTelefono, conectarTelefono, leerTelefono } from "./telefono.js?v=127";
 const escH = t => String(t ?? "").replace(/[<>&"']/g, c => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;", "'": "&#39;" }[c]));
 
 const money = n => "$" + Number(n).toLocaleString("es-MX");
@@ -22,7 +22,6 @@ function nuevoFolio() {
 const CLABE_TRANSFERENCIA = "722 969 07099512872 1";
 const BANCO_TRANSFERENCIA = "Mercado Pago W";
 const BENEFICIARIO_TRANSFERENCIA = "Jose Daniel Martinez Velez";
-const AVISO_WHATSAPP = false;
 
 let user = null, perfil = null;
 dbListo.then(d => {
@@ -137,7 +136,7 @@ async function mostrarClabe({ productos, entrega, total, cliente, telefono, dire
   const apartados = Array.isArray(r.lineas) && r.lineas.length
     ? r.lineas.map(l => ({ qty: l.qty, title: l.nombre, talla: l.talla }))
     : (productos || []);
-  const resumen = apartados.map(p => `${p.qty}x ${p.title}${p.talla ? " (T " + p.talla + ")" : ""}`).join(", ");
+  const resumen = apartados.map(p => `${p.qty}x ${p.title}${p.talla ? " (talla " + p.talla + ")" : ""}`).join(", ");
   const entregaTxt = entrega === "domicilio" ? `Entrega a domicilio: ${direccion || ""}` : "Recoge en tienda";
   const descTxt = desc ? `\nDescuento mayoreo -10%: -${money(desc)}` : "";
   track("transferencia", { ref, total: totalFinal, cliente: cliente || "" });
@@ -146,50 +145,59 @@ async function mostrarClabe({ productos, entrega, total, cliente, telefono, dire
   const ov = document.createElement("div");
   ov.id = "trOverlay";
   ov.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(3px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px";
-  ov.innerHTML = `
-    <div style="background:#0f0f12;border:1px solid #26262e;border-radius:18px;max-width:440px;width:100%;padding:24px;font-family:inherit;color:#f4f4f5;max-height:92vh;overflow:auto">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-        <h3 style="margin:0;font-size:24px;font-weight:800">Paga por transferencia</h3>
-        <button id="trClose" style="background:none;border:none;color:#9a9aa2;font-size:24px;cursor:pointer;line-height:1">✕</button>
+  const caja = "background:#0f0f12;border:1px solid #26262e;border-radius:18px;max-width:440px;width:100%;padding:24px;font-family:inherit;color:#f4f4f5;max-height:92vh;overflow:auto";
+  const ICONO_WA = `<svg viewBox="0 0 24 24" width="26" height="26" fill="#e8b923" aria-label="WhatsApp"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.39-1.48-.88-.79-1.48-1.76-1.65-2.06-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.61-.92-2.21-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.21 3.08c.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.69.63.71.23 1.36.19 1.87.12.57-.09 1.76-.72 2.01-1.41.25-.69.25-1.29.17-1.41-.07-.12-.27-.2-.57-.35zM12.04 21.5h-.01a9.43 9.43 0 0 1-4.8-1.32l-.35-.2-3.57.94.95-3.48-.22-.36a9.4 9.4 0 0 1-1.45-5.02c0-5.2 4.24-9.44 9.46-9.44a9.4 9.4 0 0 1 6.68 2.77 9.38 9.38 0 0 1 2.76 6.68c0 5.21-4.24 9.44-9.45 9.44zm8.04-17.48A11.3 11.3 0 0 0 12.04.7C5.77.7.67 5.8.67 12.06c0 2 .52 3.96 1.52 5.68L.57 23.65l6.04-1.58a11.3 11.3 0 0 0 5.42 1.38h.01c6.26 0 11.36-5.1 11.36-11.36 0-3.03-1.18-5.89-3.32-8.03z"/></svg>`;
+  const oro = "display:block;width:100%;text-align:center;background:linear-gradient(135deg,#e8b923,#f7d154);color:#1a1405;border:none;border-radius:12px;padding:15px;font-weight:800;font-size:17px;text-decoration:none;cursor:pointer;font-family:inherit";
+  const fila = (k, v) => `<div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:8px"><span style="color:#9a9aa2;font-size:15.5px">${k}</span>${v}</div>`;
+  const cab = t => `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><h3 style="margin:0;font-size:24px;font-weight:800">${t}</h3><button id="trClose" style="background:none;border:none;color:#9a9aa2;font-size:24px;cursor:pointer;line-height:1">✕</button></div>`;
+  const pedidoNum = `<div style="display:flex;justify-content:space-between;align-items:baseline"><span style="color:#9a9aa2;font-size:15.5px">Número de pedido</span><b style="font-size:22px;letter-spacing:.06em;white-space:nowrap">${ref}</b></div>`;
+  const banco = CLABE_TRANSFERENCIA ? `
+        ${fila("Banco", `<b>${BANCO_TRANSFERENCIA}</b>`)}
+        ${fila("Beneficiario", `<b style="text-align:right">${BENEFICIARIO_TRANSFERENCIA}</b>`)}
+        <div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;align-items:center"><span style="color:#9a9aa2;font-size:15.5px">CLABE</span><button id="trCopy" style="background:#26262c;border:none;color:#e8b923;border-radius:8px;padding:4px 10px;font-size:14px;cursor:pointer">Copiar</button></div><b style="display:block;margin-top:6px;font-size:clamp(17px,5.2vw,21px);letter-spacing:.5px;white-space:nowrap">${CLABE_TRANSFERENCIA}</b></div>` : "";
+  const datosBanco = `
+      <div style="background:#0e0e11;border:1px solid #2a2a32;border-radius:12px;padding:14px 14px 6px;margin-bottom:16px">
+        ${banco}
+        ${fila("Monto", `<b style="color:#e8b923;font-size:21px">${money(totalFinal)}</b>`)}
+      </div>`;
+  const paso1 = `
+    <div style="${caja}">
+      ${cab("Paga por transferencia")}
+      <p style="margin:0 0 14px;font-size:15.5px;line-height:1.5;color:#9a9aa2">Transfiere el monto a esta cuenta. Tu playera queda apartada 48 horas. Si te equivocaste, cierra con la ✕ y se cancela.</p>
+      ${datosBanco}
+      <p style="margin:0 0 10px;font-size:17px;line-height:1.45;color:#f4f4f5;font-weight:700">Una vez terminada la transferencia, da clic aquí:</p>
+      <button type="button" id="trYa" style="${oro}">Ya transferí</button>
+    </div>`;
+  const paso2 = `
+    <div style="${caja}">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><h3 style="margin:0;display:flex;align-items:center;gap:12px;font-size:26px;font-weight:800;color:#e8b923"><span style="width:40px;height:40px;flex:none;border-radius:50%;display:grid;place-items:center;font-size:20px;background:#2a2109;color:#f7d154;border:1px solid #4a3f18">✓</span>¡Gracias por tu compra!</h3><button id="trClose" style="background:none;border:none;color:#9a9aa2;font-size:24px;cursor:pointer;line-height:1">✕</button></div>
+      <div style="display:flex;align-items:center;gap:10px;margin:0 0 16px;font-size:15.5px;line-height:1.5;color:#c9c9cf">${ICONO_WA}<span>Te mandamos un WhatsApp con toda la información de tu pedido.</span></div>
+      <p style="margin:0 0 12px;font-size:18px;line-height:1.45;color:#f4f4f5;font-weight:700">Mándanos tu comprobante al <span style="color:#e8b923;white-space:nowrap">${NEGOCIO.telefono}</span> o da clic aquí:</p>
+      <a href="${waLink}" target="_blank" rel="noopener" style="${oro};margin-bottom:14px">Enviar comprobante</a>
+      <div style="background:#0e0e11;border:1px solid #2a2a32;border-radius:12px;padding:14px;margin-bottom:12px">
+        ${fila("Tu pedido", `<b style="text-align:right;max-width:60%">${escH(resumen)}</b>`)}
+        ${fila("Monto", `<b style="color:#e8b923;font-size:21px">${money(totalFinal)}</b>`)}
+        ${pedidoNum}
       </div>
-      <p style="margin:0 0 12px;font-size:15.5px;color:#9a9aa2">${CLABE_TRANSFERENCIA
-        ? `Cuando transfieras, mándanos tu comprobante al <b style="color:#f4f4f5">${NEGOCIO.telefono}</b> o da clic aquí:`
-        : "Ya te apartamos tu jersey por 48 horas. Manda tu pedido por WhatsApp y te pasamos los datos para transferir."}</p>
-      <a href="${waLink}" target="_blank" rel="noopener" style="display:block;text-align:center;background:linear-gradient(135deg,#e8b923,#f7d154);color:#1a1405;border-radius:12px;padding:14px;font-weight:800;font-size:17px;text-decoration:none;margin-bottom:12px">Abrir WhatsApp</a>
-      ${CLABE_TRANSFERENCIA ? `<p style="margin:0 0 16px;font-size:15.5px;color:#9a9aa2">Apartamos tu playera por 48 horas; si no recibimos el comprobante en ese tiempo, la liberamos.</p>` : ""}
-      <div style="background:#0e0e11;border:1px solid #2a2a32;border-radius:12px;padding:14px;margin-bottom:14px">
-        ${CLABE_TRANSFERENCIA ? `
-        <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="color:#9a9aa2;font-size:15.5px">Banco</span><b>${BANCO_TRANSFERENCIA}</b></div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="color:#9a9aa2;font-size:15.5px">Beneficiario</span><b style="text-align:right">${BENEFICIARIO_TRANSFERENCIA}</b></div>
-        <div style="margin-bottom:8px"><span style="color:#9a9aa2;font-size:15.5px">CLABE</span><div style="display:flex;align-items:center;gap:8px;margin-top:4px"><b id="trClabe" style="font-size:21px;letter-spacing:1px">${CLABE_TRANSFERENCIA}</b><button id="trCopy" style="background:#26262c;border:none;color:#e8b923;border-radius:8px;padding:4px 10px;font-size:14px;cursor:pointer">Copiar</button></div></div>` : ""}
-        <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="color:#9a9aa2;font-size:15.5px">Tu pedido</span><b style="text-align:right;max-width:60%">${escH(resumen)}</b></div>
-        ${desc
-          ? `<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px"><span style="color:#e8b923;font-size:15.5px;font-weight:700">Precio mayorista −10%</span><span><s style="color:#7a7a82;font-size:16px;margin-right:8px">${money(total)}</s><b style="color:#e8b923;font-size:23px">${money(totalFinal)}</b></span></div>`
-          : `<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="color:#9a9aa2;font-size:15.5px">Monto</span><b style="color:#e8b923;font-size:21px">${money(totalFinal)}</b></div>`}
-        <div style="display:flex;justify-content:space-between"><span style="color:#9a9aa2;font-size:15.5px">Número de pedido</span><b style="font-size:24px;letter-spacing:.06em">${ref}</b></div>
-      </div>
-      ${AVISO_WHATSAPP ? `<div style="margin-top:14px;background:#0e0e11;border:1px solid #2a2a32;border-radius:12px;padding:12px 14px;font-size:15px;line-height:1.55;color:#c9c9cf">💬 Te vamos a mandar un WhatsApp${telefono ? ` al <b style="color:#f4f4f5">${String(telefono).replace(/[^\d +()-]/g, "")}</b>` : ""} con todos los datos de tu pedido.<br>¿Dudas? Escríbenos al <a href="https://wa.me/${WHATSAPP_NUMERO}" target="_blank" rel="noopener" style="color:#e8b923;font-weight:700;text-decoration:none">${NEGOCIO.telefono}</a>.</div>` : ""}
+      <button type="button" id="trVerDatos" style="display:block;width:100%;margin:0 0 12px;background:none;border:1px solid #2e2e38;color:#f4f4f5;border-radius:12px;padding:12px;font-weight:700;font-size:15.5px;cursor:pointer;font-family:inherit">Ver datos de transferencia</button>
+      <div id="trDatos" hidden>${datosBanco}</div>
+      <p style="margin:0 0 4px;font-size:14.5px;line-height:1.5;color:#9a9aa2">Cuando confirmemos tu pago te avisamos por WhatsApp. Si en 48 horas no recibimos el comprobante, liberamos la playera.</p>
       ${entrega === "domicilio" ? "" : `<a href="${rutaMapa()}" target="_blank" rel="noopener" style="display:block;text-align:center;margin-top:10px;border:1px solid #2e2e38;color:#f4f4f5;border-radius:12px;padding:13px;font-weight:700;font-size:16px;text-decoration:none">📍 Cómo llegar a la tienda</a>`}
       <p style="margin:14px 0 0;font-size:15px;line-height:1.55;color:${invitado ? "#f7d154" : "#9a9aa2"}">${invitado
-        ? `Guarda tu número de pedido <b>${ref}</b>: cópialo o tómale captura. Como compraste sin cuenta, no lo vas a poder ver después en la página.`
+        ? `Guarda tu número de pedido <b>${ref}</b>: solo lo vas a tener aquí y en el mensaje de WhatsApp.`
         : `Puedes seguir tu pedido paso a paso en <a href="cuenta.html" style="color:#e8b923">Mi cuenta</a>.`}</p>
-      <button type="button" id="trCancelar" style="display:block;width:100%;margin-top:14px;background:none;border:1px solid #3a2a2a;color:#ff9b9b;border-radius:12px;padding:12px;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit">↩ Me equivoqué: cancelar este pedido y empezar de nuevo</button>
     </div>`;
-  document.body.appendChild(ov);
+  let paso = 1;
   const q = s => ov.querySelector(s);
-  /* al cerrar el modal damos por terminada la transferencia: el cliente ya vio los datos
-     y se fue a pagar/mandar su comprobante. Queda como venta POR CONFIRMAR. */
   const cerrar = () => {
-    track("transferencia_fin", { ref, total: totalFinal });
+    track("transferencia_fin", { ref, total: totalFinal, paso });
     track("compra", { via: "transferencia", porConfirmar: true, ref, total: totalFinal });
     ov.remove();
   };
-  q("#trClose").onclick = cerrar;
-  ov.addEventListener("click", e => { if (e.target === ov) cerrar(); });
-  q("#trCancelar").onclick = async () => {
-    if (!confirm(`¿Cancelar el pedido ${ref}? La playera vuelve a la tienda y puedes hacerlo otra vez.`)) return;
-    const btn = q("#trCancelar");
-    btn.disabled = true; btn.textContent = "Cancelando…";
+  const cancelar = async () => {
+    if (!confirm(`¿Cancelar el pedido ${ref}? La playera vuelve a la tienda y puedes hacerlo otra vez.\n\nSi ya transferiste, mejor da clic en «Ya transferí».`)) return;
+    const x = q("#trClose");
+    x.disabled = true;
     const idToken = await dbListo.then(d => d.token()).catch(() => null);
     const res = await fetch(CANCELAR_WEBHOOK, {
       method: "POST", headers: { "Content-Type": "application/json" },
@@ -202,17 +210,42 @@ async function mostrarClabe({ productos, entrega, total, cliente, telefono, dire
       a.style.cursor = "pointer"; a.onclick = () => a.remove(); setTimeout(() => a.remove(), 6000);
       return;
     }
-    btn.disabled = false; btn.textContent = "↩ Me equivoqué: cancelar este pedido y empezar de nuevo";
+    x.disabled = false;
     alert(res.motivo === "ya no se puede" ? "Este pedido ya no se puede cancelar desde aquí. Escríbenos por WhatsApp." : "No se pudo cancelar. Revisa tu internet e inténtalo otra vez.");
   };
-  ov.querySelector('a[href*="wa.me"]')?.addEventListener("click", () => {
-    track("comprobante_whatsapp", { ref, total: totalFinal });
-  });
-  const btnCopy = q("#trCopy");
-  if (btnCopy) btnCopy.onclick = () => {
-    navigator.clipboard?.writeText(CLABE_TRANSFERENCIA.replace(/\s/g, ""));
-    btnCopy.textContent = "Copiado ✓";
+  const pintar = () => {
+    ov.innerHTML = paso === 1 ? paso1 : paso2;
+    q("#trClose").onclick = paso === 1 ? cancelar : cerrar;
+    const btnCopy = q("#trCopy");
+    if (btnCopy) btnCopy.onclick = () => {
+      navigator.clipboard?.writeText(CLABE_TRANSFERENCIA.replace(/\s/g, ""));
+      btnCopy.textContent = "Copiado ✓";
+    };
+    if (paso === 2) {
+      q("#trVerDatos").onclick = () => {
+        const d = q("#trDatos"), abrir = d.hidden;
+        d.hidden = !abrir;
+        q("#trVerDatos").textContent = abrir ? "Ocultar datos de transferencia" : "Ver datos de transferencia";
+        const c = q("#trDatos #trCopy");
+        if (c) c.onclick = () => { navigator.clipboard?.writeText(CLABE_TRANSFERENCIA.replace(/\s/g, "")); c.textContent = "Copiado ✓"; };
+      };
+      ov.querySelector('a[href*="wa.me"]')?.addEventListener("click", () => track("comprobante_whatsapp", { ref, total: totalFinal }));
+      return;
+    }
+    q("#trYa").onclick = async () => {
+      if (!confirm("¿Ya hiciste la transferencia? Después de esto ya no se puede cancelar el pedido desde la página.")) return;
+      const btn = q("#trYa");
+      btn.disabled = true; btn.textContent = "Avisando…";
+      const idToken = await dbListo.then(d => d.token()).catch(() => null);
+      fetch(AVISO_WEBHOOK, { method: "POST", headers: { "Content-Type": "application/json" }, keepalive: true, body: JSON.stringify({ tipo: "transferi", id: r.id, idToken }) }).catch(() => {});
+      track("ya_transferi", { ref, total: totalFinal });
+      paso = 2;
+      pintar();
+    };
   };
+  ov.addEventListener("click", e => { if (e.target === ov && paso === 2) cerrar(); });
+  document.body.appendChild(ov);
+  pintar();
 }
 
 function rutaMapa() {
