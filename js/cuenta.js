@@ -1,5 +1,8 @@
-import { db } from "./db.js?v=125";
-import { WHATSAPP_NUMERO, BORRAR_CUENTA_WEBHOOK } from "./config.js?v=125";
+import { db } from "./db.js?v=126";
+import { WHATSAPP_NUMERO, BORRAR_CUENTA_WEBHOOK } from "./config.js?v=126";
+import { campoTelefono, conectarTelefono, ponerTelefono, leerTelefono } from "./telefono.js?v=126";
+const cajaTel = document.getElementById("fTelCaja");
+if (cajaTel) { cajaTel.innerHTML = campoTelefono("fTel", "padding:12px 14px;border-radius:11px;border:1px solid #2a2a30;background:#0e0e11;color:#f4f4f5;font-size:16px;outline:none;box-sizing:border-box"); conectarTelefono(document, "fTel"); }
 const escH = t => String(t ?? "").replace(/[<>&"']/g, c => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;", "'": "&#39;" }[c]));
 const escC = t => String(t ?? "").replace(/[<>&"]/g, c => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" }[c]));
 
@@ -24,7 +27,7 @@ async function loadPerfil(uid) {
   try {
     const p = await db.getPerfil(uid);
     if (!p) return;
-    set("fNombre", p.nombre); set("fTel", p.telefono); set("fCalle", p.calle); set("fNac", p.nacimiento);
+    set("fNombre", p.nombre); ponerTelefono(document, "fTel", p.telefono || ""); set("fCalle", p.calle); set("fNac", p.nacimiento);
     set("fCol", p.colonia); set("fCP", p.cp); set("fCiudad", p.ciudad);
     set("fEstado", p.estado); set("fRef", p.referencias);
     pistaDatos(p);
@@ -180,8 +183,10 @@ $("#cuentaEntrar")?.addEventListener("click", () => document.getElementById("aut
 
 $("#cuentaGuardar")?.addEventListener("click", async () => {
   if (!user) return;
+  const lt = leerTelefono(document, "fTel");
+  if (!lt.ok && !lt.vacio) { const m = $("#cuentaMsg"); m.style.color = "#ff6b6b"; m.textContent = lt.error; return; }
   const data = {
-    nombre: val("fNombre"), telefono: val("fTel"), nacimiento: val("fNac"), calle: val("fCalle"),
+    nombre: val("fNombre"), telefono: lt.valor, nacimiento: val("fNac"), calle: val("fCalle"),
     colonia: val("fCol"), cp: val("fCP"), ciudad: val("fCiudad"), estado: val("fEstado"),
     referencias: val("fRef"), email: user.email, actualizado: new Date().toISOString()
   };
