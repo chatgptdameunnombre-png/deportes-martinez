@@ -1,4 +1,4 @@
-import { validarPromotor, promoVigente } from "./promotor.js?v=136";
+import { validarPromotor, promoVigente } from "./promotor.js?v=137";
 
 const KEY = "dm_promo_vista";
 
