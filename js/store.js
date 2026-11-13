@@ -1,11 +1,11 @@
-import { catalogoRapido, guardarCatalogo } from "./catalogo.js?v=134";
-import { setProductos, initCart, enCarrito } from "./cart.js?v=134";
-import { tieneTallas, stockTotal, precioDesde, preciosVarian, etiquetaStock, tallasDisponibles, precioAntes } from "./tallas.js?v=134";
-import { onMayoreo, precioHTML } from "./mayoreo.js?v=134";
-import { track } from "./track.js?v=134";
-import { tarjetaSugerenciaHTML, conectarFormulario } from "./sugerencias.js?v=134";
-import { ESCUDOS } from "./escudos.js?v=134";
-import { fotoMedia } from "./fotos.js?v=134";
+import { catalogoRapido, guardarCatalogo } from "./catalogo.js?v=135";
+import { setProductos, initCart, enCarrito } from "./cart.js?v=135";
+import { tieneTallas, stockTotal, precioDesde, preciosVarian, etiquetaStock, tallasDisponibles, precioAntes } from "./tallas.js?v=135";
+import { onMayoreo, precioHTML } from "./mayoreo.js?v=135";
+import { track } from "./track.js?v=135";
+import { tarjetaSugerenciaHTML, conectarFormulario } from "./sugerencias.js?v=135";
+import { ESCUDOS } from "./escudos.js?v=135";
+import { fotoMedia } from "./fotos.js?v=135";
 
 const $ = s => document.querySelector(s);
 const CAT = document.querySelector("#catalogo")?.dataset.categoria || null;
@@ -219,7 +219,8 @@ const NOMBRE_LIGA = { "Selección Nacional": "Selecciones" };
 
 function escudoHTML(eq) {
   const a = ESCUDOS[eq];
-  return a ? `<button type="button" class="liga-head__esc" data-escudo="${esc(eq)}" title="${esc(eq)}"><img src="fotos/escudos/${a}.webp" alt="${esc(eq)}" width="64" height="64" loading="lazy"></button>` : "";
+  const on = f.equipo === eq;
+  return a ? `<button type="button" class="liga-head__esc${on ? " on" : ""}" data-escudo="${esc(eq)}" title="${esc(eq)}" aria-pressed="${on}"><img src="fotos/escudos/${a}.webp" alt="${esc(eq)}" width="64" height="64" loading="lazy"></button>` : "";
 }
 
 function porLigas(lista) {
@@ -233,11 +234,12 @@ function porLigas(lista) {
   const ligas = [...grupos.keys()].sort((a, b) => pos(a) - pos(b) || a.localeCompare(b));
   return ligas.map(l => {
     const ps = grupos.get(l).sort(ordenEquipo);
-    const equipos = [...new Set(ps.map(p => p.equipo).filter(e => ESCUDOS[e]))];
+    const deLiga = f.equipo !== "Todos" ? base().filter(p => p.liga === l).sort(ordenEquipo) : ps;
+    const equipos = [...new Set(deLiga.map(p => p.equipo).filter(e => ESCUDOS[e]))];
     const mitad = Math.ceil(equipos.length / 2);
     const izq = equipos.slice(0, mitad).map(escudoHTML).join("");
     const der = equipos.slice(mitad).map(escudoHTML).join("");
-    return `<div class="liga-head reveal">
+    return `<div class="liga-head reveal${f.equipo !== "Todos" ? " liga-head--filtro" : ""}">
         <div class="liga-head__lado liga-head__lado--izq">${izq}</div>
         <h2 class="liga-head__t">${esc(NOMBRE_LIGA[l] || l)}</h2>
         <div class="liga-head__lado">${der}</div>
@@ -337,6 +339,11 @@ function marcarSel() {
   document.querySelectorAll("#filtrosPanel .opt").forEach(o => {
     o.classList.toggle("sel", f[o.dataset.f] === o.dataset.v);
   });
+  const INICIAL = { sub: "Todas", liga: "Todas", equipo: "Todos", color: "Todos", temporada: "Todas", marca: "Todas", talla: "Todas", orden: "rel" };
+  document.querySelectorAll("#filtrosPanel .acc[data-grp]").forEach(a => {
+    const k = a.dataset.grp;
+    a.classList.toggle("acc--activo", k in INICIAL && f[k] !== INICIAL[k]);
+  });
   const n = activos();
   const c = $("#fcount"); if (c) { c.textContent = n ? n : ""; c.style.display = n ? "" : "none"; }
 }
@@ -420,7 +427,7 @@ document.addEventListener("click", e => {
   if (h) { h.parentElement.classList.toggle("open"); return; }
   const escudo = e.target.closest("[data-escudo]");
   if (escudo) {
-    f.equipo = escudo.dataset.escudo;
+    f.equipo = f.equipo === escudo.dataset.escudo ? "Todos" : escudo.dataset.escudo;
     track("filtro", { categoria: CAT, campo: "equipo", campoTxt: "equipo", valor: f.equipo });
     render();
     $("#catalogo")?.scrollIntoView({ behavior: "smooth", block: "start" });
