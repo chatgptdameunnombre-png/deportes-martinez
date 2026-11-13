@@ -1,7 +1,7 @@
-import { db } from "./db.js?v=130";
-import { KIKI_EMAIL, AVISO_WEBHOOK } from "./config.js?v=130";
-import { pintarEstadisticas } from "./estadisticas.js?v=130";
-import "./panel-nav.js?v=130";
+import { db } from "./db.js?v=131";
+import { KIKI_EMAIL, AVISO_WEBHOOK } from "./config.js?v=131";
+import { pintarEstadisticas } from "./estadisticas.js?v=131";
+import "./panel-nav.js?v=131";
 
 const $ = s => document.querySelector(s);
 const money = n => "$" + Number(n).toLocaleString("es-MX");
@@ -28,7 +28,7 @@ db.onAuth(user => {
   $("#dash").hidden = false;
   const soyKiki = (user.email || "").toLowerCase() === KIKI_EMAIL;
   $("#pnavPromotores").hidden = !soyKiki;
-  if (soyKiki) import("./promotores.js?v=130").then(m => m.iniciarPromotores(db));
+  if (soyKiki) import("./promotores.js?v=131").then(m => m.iniciarPromotores(db));
   window.scrollTo(0, 0);
   arrancarDash();
 });
@@ -830,11 +830,11 @@ function vtFila(v) {
     <div class="vt-folio">
       <span class="vt-folio__k">Pedido</span>
       <b class="vt-folio__v">${escHTML(v.folio || v.id)}</b>
-      <span class="vt-folio__m">pagó con ${v.metodo === "transferencia" ? "transferencia" : "tarjeta"}</span>
+      <span class="vt-folio__m">pagó con ${v.metodo === "transferencia" ? "transferencia" : v.metodo && v.metodo !== "tarjeta" ? escHTML(String(v.metodo).toUpperCase()) + " (Mercado Pago)" : "tarjeta"}</span>
     </div>
 
     ${porCobrar ? `<div class="vt-acciones">
-      <button class="btn" data-vt-pagada="${escHTML(v.id)}">✓ Ya me pagó</button>
+      ${v.metodo && !["transferencia", "tarjeta"].includes(v.metodo) ? `<span class="vt-pill">Esperando que pague su ficha de ${escHTML(String(v.metodo).toUpperCase())}: se confirma solo</span>` : `<button class="btn" data-vt-pagada="${escHTML(v.id)}">✓ Ya me pagó</button>`}
       ${vtWhats(v.telefono, v)}
       <button class="btn btn--danger" data-vt-cancelar="${escHTML(v.id)}">No pagó · cancelar</button>
     </div>` : ""}
