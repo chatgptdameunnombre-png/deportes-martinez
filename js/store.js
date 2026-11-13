@@ -1,10 +1,11 @@
-import { catalogoRapido, guardarCatalogo } from "./catalogo.js?v=133";
-import { setProductos, initCart, enCarrito } from "./cart.js?v=133";
-import { tieneTallas, stockTotal, precioDesde, preciosVarian, etiquetaStock, tallasDisponibles, precioAntes } from "./tallas.js?v=133";
-import { onMayoreo, precioHTML } from "./mayoreo.js?v=133";
-import { track } from "./track.js?v=133";
-import { tarjetaSugerenciaHTML, conectarFormulario } from "./sugerencias.js?v=133";
-import { ESCUDOS } from "./escudos.js?v=133";
+import { catalogoRapido, guardarCatalogo } from "./catalogo.js?v=134";
+import { setProductos, initCart, enCarrito } from "./cart.js?v=134";
+import { tieneTallas, stockTotal, precioDesde, preciosVarian, etiquetaStock, tallasDisponibles, precioAntes } from "./tallas.js?v=134";
+import { onMayoreo, precioHTML } from "./mayoreo.js?v=134";
+import { track } from "./track.js?v=134";
+import { tarjetaSugerenciaHTML, conectarFormulario } from "./sugerencias.js?v=134";
+import { ESCUDOS } from "./escudos.js?v=134";
+import { fotoMedia } from "./fotos.js?v=134";
 
 const $ = s => document.querySelector(s);
 const CAT = document.querySelector("#catalogo")?.dataset.categoria || null;
@@ -170,7 +171,7 @@ function cardHTML(p) {
           ? `<button class="add-btn" disabled>Máximo en carrito</button>`
           : `<button class="add-btn" data-add="${esc(p.id)}">Agregar al carrito</button>`);
   const media = p.imagen
-    ? `<img src="${esc(p.imagen)}" alt="${esc(p.nombre)}" loading="lazy" onerror="this.style.display='none';this.parentElement.querySelector('.card__ph').style.display='block'">
+    ? `<img src="${esc(fotoMedia(p.imagen))}" alt="${esc(p.nombre)}" loading="lazy" onerror="this.style.display='none';this.parentElement.querySelector('.card__ph').style.display='block'">
        <span class="card__ph" style="display:none">📷 Sin foto aún</span>`
     : `<span class="card__ph">📷 Foto pendiente</span>`;
   const flags = [
