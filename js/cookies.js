@@ -36,14 +36,19 @@ function mostrar() {
       <button id="ckSi" style="background:#e8b923;border:none;color:#1a1405;border-radius:10px;padding:10px 22px;font-weight:700;font-size:13.5px;cursor:pointer">Entendido</button>
     </div>`;
   document.body.appendChild(b);
-  b.querySelector("#ckSi").onclick = () => { guardar("si"); b.remove(); };
+  b.querySelector("#ckSi").onclick = () => { guardar("si"); b.remove(); vigia.disconnect(); };
+  const hayModal = () => !!document.querySelector(".aviso-modal");
+  const ajustar = () => { b.style.display = hayModal() ? "none" : "flex"; };
+  const vigia = new MutationObserver(ajustar);
+  vigia.observe(document.body, { childList: true });
+  ajustar();
 
   /* Se queda mientras la persona esté en la página, para que alcance a leerlo.
      Solo se toma como aceptado cuando se va a otra parte del sitio (toca un
      enlace): así no le vuelve a salir en cada página. Con el scroll NO se cierra,
      porque se iba en dos segundos y nadie alcanzaba a verlo. */
-  const aceptarNavegando = () => { guardar("si"); b.remove(); limpiar(); };
-  const alClickEnlace = e => { if (e.target.closest("a[href]")) aceptarNavegando(); };
+  const aceptarNavegando = () => { guardar("si"); b.remove(); limpiar(); vigia.disconnect(); };
+  const alClickEnlace = e => { if (e.target.closest("a[href]") && !e.target.closest(".aviso-modal") && b.style.display !== "none") aceptarNavegando(); };
   function limpiar() { document.removeEventListener("click", alClickEnlace, true); }
   document.addEventListener("click", alClickEnlace, true);
 }
