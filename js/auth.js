@@ -1,6 +1,6 @@
-import { esperaRestante, anotaFallo, limpiaFallos, esFalloDeClave, textoEspera } from "./clave-segura.js?v=125";
-import { db } from "./db.js?v=125";
-import { EDAD_MINIMA } from "./config.js?v=125";
+import { esperaRestante, anotaFallo, limpiaFallos, esFalloDeClave, textoEspera } from "./clave-segura.js?v=126";
+import { db } from "./db.js?v=126";
+import { EDAD_MINIMA } from "./config.js?v=126";
 
 const OWNER_EMAILS = ["admindeportesmartinez@gmail.com"];
 const esDueno = u => !!u && OWNER_EMAILS.includes((u.email || "").toLowerCase());
@@ -150,7 +150,7 @@ function traducirError(err) {
   if (c.includes("invalid-credential") || c.includes("wrong-password") || c.includes("user-not-found"))
     return "Correo o contraseña incorrectos.";
   if (c.includes("email-already-in-use")) return "Ese correo ya tiene una cuenta. Inicia sesión.";
-  if (c.includes("weak-password")) return "La contraseña debe tener al menos 6 caracteres.";
+  if (c.includes("weak-password")) return "Tu contraseña necesita mínimo 8 caracteres, con al menos una letra y un número.";
   if (c.includes("invalid-email")) return "El correo no es válido.";
   if (c.includes("too-many-requests")) return "Demasiados intentos. Espera un momento.";
   if (c.includes("unauthorized-domain")) return "Dominio no autorizado en Firebase.";
@@ -184,6 +184,11 @@ function openModal(mode, alEntrar) {
                autocapitalize="none" autocorrect="off" spellcheck="false">
         <button type="button" class="authOjo" id="authOjo" aria-pressed="false" aria-label="Mostrar contraseña">${OJO_TACHADO}</button>
       </div>
+      <ul id="authReglas" hidden style="list-style:none;margin:-4px 0 12px;padding:0;font-size:13px;line-height:1.7;color:#8a8a92">
+        <li data-r="largo">○ Mínimo 8 caracteres</li>
+        <li data-r="letra">○ Al menos una letra</li>
+        <li data-r="numero">○ Al menos un número</li>
+      </ul>
       <div id="authNacBox" hidden>
         <label for="authNac" style="display:block;font-size:13px;color:#9a9aa2;margin:2px 0 6px">Tu fecha de nacimiento</label>
         <input id="authNac" class="authInp" type="date" autocomplete="bday">
@@ -207,6 +212,16 @@ function openModal(mode, alEntrar) {
   };
   ov.addEventListener("click", e => { if (e.target === ov) cerrar(); });
 
+  const reglas = pass => ({ largo: pass.length >= 8, letra: /[a-záéíóúñü]/i.test(pass), numero: /\d/.test(pass) });
+  const pintarReglas = () => {
+    const r = reglas(q("#authPass").value.trim());
+    q("#authReglas").querySelectorAll("li").forEach(li => {
+      const ok = r[li.dataset.r];
+      li.style.color = ok ? "#e8b923" : "#8a8a92";
+      li.textContent = (ok ? "✓ " : "○ ") + li.textContent.slice(2);
+    });
+  };
+  q("#authPass").addEventListener("input", pintarReglas);
   let m = mode;
   const setMode = nuevo => {
     m = nuevo;
@@ -215,6 +230,8 @@ function openModal(mode, alEntrar) {
     q("#authPass").parentNode.style.display = "";
     q("#authPass").setAttribute("autocomplete", m === "login" ? "current-password" : "new-password");
     q("#authNacBox").hidden = m !== "register";
+    q("#authReglas").hidden = m !== "register";
+    pintarReglas();
     if (m === "login") { q("#authSub").textContent = "Entra para guardar tu dirección y comprar más rápido."; q("#authGo").textContent = "Entrar"; }
     else { q("#authSub").textContent = `Crea tu cuenta con correo y contraseña. Necesitas tener ${EDAD_MINIMA} años o más.`; q("#authGo").textContent = "Crear cuenta"; }
   };
@@ -227,7 +244,10 @@ function openModal(mode, alEntrar) {
     const email = q("#authEmail").value.trim().toLowerCase(), pass = q("#authPass").value.trim();
     q("#authErr").textContent = ""; q("#authMsg").textContent = "";
     if (!email || !pass) { q("#authErr").textContent = "Completa correo y contraseña."; return; }
-    if (m === "register" && pass.length < 6) { q("#authErr").textContent = "La contraseña necesita al menos 6 letras o números."; return; }
+    if (m === "register") {
+      const r = reglas(pass);
+      if (!r.largo || !r.letra || !r.numero) { q("#authErr").textContent = "Tu contraseña necesita mínimo 8 caracteres, con al menos una letra y un número."; return; }
+    }
     const nacimiento = m === "register" ? q("#authNac").value : "";
     if (m === "register") {
       if (!nacimiento) { q("#authErr").textContent = "Pon tu fecha de nacimiento."; return; }
@@ -280,7 +300,7 @@ else document.addEventListener("DOMContentLoaded", init);
 function aplicarUsuario(u) {
   currentUser = u;
   updateButton();
-  import("./track.js?v=125").then(t => t.setCliente(u?.uid || "", u?.email || "")).catch(() => {});
+  import("./track.js?v=126").then(t => t.setCliente(u?.uid || "", u?.email || "")).catch(() => {});
 }
 
 db.onAuth(u => aplicarUsuario(u));
