@@ -1,10 +1,10 @@
-import { catalogoRapido, guardarCatalogo } from "./catalogo.js?v=132";
-import { setProductos, initCart, enCarrito } from "./cart.js?v=132";
-import { tieneTallas, stockTotal, precioDesde, preciosVarian, etiquetaStock, tallasDisponibles, precioAntes } from "./tallas.js?v=132";
-import { onMayoreo, precioHTML } from "./mayoreo.js?v=132";
-import { track } from "./track.js?v=132";
-import { tarjetaSugerenciaHTML, conectarFormulario } from "./sugerencias.js?v=132";
-import { ESCUDOS } from "./escudos.js?v=132";
+import { catalogoRapido, guardarCatalogo } from "./catalogo.js?v=133";
+import { setProductos, initCart, enCarrito } from "./cart.js?v=133";
+import { tieneTallas, stockTotal, precioDesde, preciosVarian, etiquetaStock, tallasDisponibles, precioAntes } from "./tallas.js?v=133";
+import { onMayoreo, precioHTML } from "./mayoreo.js?v=133";
+import { track } from "./track.js?v=133";
+import { tarjetaSugerenciaHTML, conectarFormulario } from "./sugerencias.js?v=133";
+import { ESCUDOS } from "./escudos.js?v=133";
 
 const $ = s => document.querySelector(s);
 const CAT = document.querySelector("#catalogo")?.dataset.categoria || null;
@@ -372,7 +372,7 @@ function render() {
   if (!productos.length) { gridEl.innerHTML = `<p style="color:var(--muted)">Cargando…</p>`; return; }
   const res = $("#buscarRes");
   if (res) res.textContent = buscando && lista.length ? `${lista.length} ${lista.length === 1 ? "jersey" : "jerseys"} para «${q.trim()}»` : "";
-  if (lista.length) gridEl.innerHTML = (!buscando && f.orden === "rel" && f.equipo === "Todos") ? porLigas(lista) : lista.map(cardHTML).join("");
+  if (lista.length) gridEl.innerHTML = (!buscando && f.orden === "rel") ? porLigas(lista) : lista.map(cardHTML).join("");
   else if (buscando) {
     gridEl.innerHTML = `<div class="buscar-vacio">
         <p class="buscar-vacio__t">No tenemos «${esc(q.trim())}» por ahora.</p>
