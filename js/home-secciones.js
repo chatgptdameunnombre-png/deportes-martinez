@@ -1,5 +1,6 @@
 /* Sección Noticias de la HOME: slider de banners (una noticia a la vez, foto grande + texto al lado). */
-import { firebaseConfig } from "./config.js?v=133";
+import { firebaseConfig } from "./config.js?v=134";
+import { fotoMedia } from "./fotos.js?v=134";
 
 const FS = `https://firestore.googleapis.com/v1/projects/${firebaseConfig.projectId}/databases/(default)/documents`;
 const KEY = firebaseConfig.apiKey;
@@ -66,7 +67,7 @@ async function cargarNoticias() {
   let pre = [];
   try {
     pre = (await runQuery("productos", "destacado")).filter(p => !p.oculto && !p.proximamente).map(p => ({
-      img: p.imagen, tipo: p.retro ? "Retro" : "Recién llegado", titulo: p.nombre,
+      img: fotoMedia(p.imagen), tipo: p.retro ? "Retro" : "Recién llegado", titulo: p.nombre,
       texto: [p.equipo, p.temporada].filter(Boolean).join(" · ") || "Ya disponible en la tienda.",
       link: `producto.html?id=${encodeURIComponent(p.id)}`, externo: false
     })).filter(a => a.img);
