@@ -1,4 +1,4 @@
-import { firebaseConfig } from "./config.js?v=127";
+import { firebaseConfig } from "./config.js?v=128";
 
 const DOCS = `https://firestore.googleapis.com/v1/projects/${firebaseConfig.projectId}/databases/(default)/documents/`;
 const KEY = "dm_catalogo_v1";
