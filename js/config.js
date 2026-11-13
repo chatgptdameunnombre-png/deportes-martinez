@@ -19,6 +19,7 @@ export const COBRO_WEBHOOK = "https://n8n.srv1473142.hstgr.cloud/webhook/dm-crea
 export const PEDIDO_WEBHOOK = "https://n8n.srv1473142.hstgr.cloud/webhook/dm-pago-ok";
 /* manda el WhatsApp de "ya nos llegó tu pago" y el aviso de pedido especial; el servidor revisa que no se repita */
 export const AVISO_WEBHOOK = "https://n8n.srv1473142.hstgr.cloud/webhook/dm-aviso";
+export const CANCELAR_WEBHOOK = "https://n8n.srv1473142.hstgr.cloud/webhook/dm-cancelar";
 /* revisa un código de descuento y dice cuánto quita, para poder enseñarlo en el carrito */
 export const PROMO_WEBHOOK = "https://n8n.srv1473142.hstgr.cloud/webhook/dm-promo";
 export const ASESOR_WEBHOOK = "https://n8n.srv1473142.hstgr.cloud/webhook/dm-asesor";
@@ -32,7 +33,7 @@ export const NEGOCIO = {
   nombre: "Deportes Martínez",
   claim: "Cumplimos sueños y vestimos campeones",
   ciudad: "",
-  mapa: "https://www.google.com/maps?q=20.546361,-103.467528",
+  mapa: "https://share.google/LqEL9e0FULMOdLhsu",
   direccion: "",
   telefono: "33 2446 9055",
   horario: "",
