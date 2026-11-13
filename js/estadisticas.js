@@ -1,4 +1,4 @@
-import { firebaseConfig } from "./config.js?v=131";
+import { firebaseConfig } from "./config.js?v=132";
 
 const $ = s => document.querySelector(s);
 const PROJ = firebaseConfig.projectId;
@@ -134,7 +134,17 @@ async function bajarSesiones(dias) {
   if (!r.ok) throw new Error("no se pudo leer (" + r.status + ")");
   const data = await r.json();
   return (data || []).filter(x => x.document)
-    .map(x => ({ id: x.document.name.split("/").pop(), ...fsFields(x.document.fields || {}) }));
+    .map(x => limpiarSesion({ id: x.document.name.split("/").pop(), ...fsFields(x.document.fields || {}) }));
+}
+
+function limpiarSesion(s) {
+  for (const k of ["busquedas", "sinResultado", "tallas", "refPedidos"])
+    s[k] = Array.isArray(s[k]) ? s[k].filter(t => typeof t === "string").map(t => t.slice(0, 120)).slice(0, 300) : [];
+  for (const k of ["nombreCliente", "refPedido", "promotor", "clienteEmail", "clienteUid", "dispositivo", "origen", "entrada", "favorito"])
+    s[k] = typeof s[k] === "string" ? s[k].slice(0, 300) : "";
+  for (const k of ["duracion", "paginas", "vistos", "alCarrito"]) s[k] = Number.isFinite(s[k]) ? s[k] : 0;
+  if (!s.productos || typeof s.productos !== "object" || Array.isArray(s.productos)) s.productos = {};
+  return s;
 }
 
 async function bajarEventos(id) {
@@ -144,7 +154,8 @@ async function bajarEventos(id) {
   });
   if (!r.ok) return [];
   const d = await r.json();
-  return fsVal(d.fields?.eventos) || [];
+  const ev = fsVal(d.fields?.eventos);
+  return Array.isArray(ev) ? ev.filter(x => x && typeof x === "object") : [];
 }
 
 /* ---------------- cálculo ---------------- */
