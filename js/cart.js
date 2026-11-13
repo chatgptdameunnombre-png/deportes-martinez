@@ -1,11 +1,11 @@
-import { ENVIO_DOMICILIO, PERSONALIZACION_PRECIO, PROMO_WEBHOOK, NEGOCIO } from "./config.js?v=135";
-import { iniciarPago, iniciarTransferencia } from "./checkout.js?v=135";
-import { tieneTallas, stockDeTalla, stockTotal, precioTalla } from "./tallas.js?v=135";
-import { onMayoreo, precioHTML, precioMay } from "./mayoreo.js?v=135";
-import { track, marcarProducto } from "./track.js?v=135";
-import { codigoDe, ponerCodigo, descuentoCodigo, revalidarCodigos, revisarCodigo } from "./codigos.js?v=135";
-import { promotorPorCodigo } from "./promotor.js?v=135";
-import { fotoMedia } from "./fotos.js?v=135";
+import { ENVIO_DOMICILIO, PERSONALIZACION_PRECIO, PROMO_WEBHOOK, NEGOCIO } from "./config.js?v=136";
+import { iniciarPago, iniciarTransferencia } from "./checkout.js?v=136";
+import { tieneTallas, stockDeTalla, stockTotal, precioTalla } from "./tallas.js?v=136";
+import { onMayoreo, precioHTML, precioMay } from "./mayoreo.js?v=136";
+import { track, marcarProducto } from "./track.js?v=136";
+import { codigoDe, ponerCodigo, descuentoCodigo, revalidarCodigos, revisarCodigo } from "./codigos.js?v=136";
+import { promotorPorCodigo } from "./promotor.js?v=136";
+import { fotoMedia } from "./fotos.js?v=136";
 const escH = t => String(t ?? "").replace(/[<>&"']/g, c => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;", "'": "&#39;" }[c]));
 
 const CART_KEY = "dm_cart";
