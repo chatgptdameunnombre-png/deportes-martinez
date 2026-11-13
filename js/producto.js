@@ -1,12 +1,12 @@
-import { catalogoRapido, fotosRapido, guardarCatalogo, productoRapido } from "./catalogo.js?v=125";
-import { setProductos, initCart, enCarrito, addCart } from "./cart.js?v=125";
-import { ENVIO_DOMICILIO, PERSONALIZACION_PRECIO, PROMO_WEBHOOK } from "./config.js?v=125";
-import { iniciarPago, iniciarTransferencia } from "./checkout.js?v=125";
-import { tieneTallas, tallasDe, stockDeTalla, stockTotal, precioTalla, precioDesde, preciosVarian, etiquetaStock, precioAntes } from "./tallas.js?v=125";
-import { onMayoreo, precioHTML, precioMay } from "./mayoreo.js?v=125";
-import { track, trackProducto, cerrarProducto } from "./track.js?v=125";
-import { promotorPorCodigo } from "./promotor.js?v=125";
-import { codigoDe, ponerCodigo, descuentoCodigo, revalidarCodigos } from "./codigos.js?v=125";
+import { catalogoRapido, fotosRapido, guardarCatalogo, productoRapido } from "./catalogo.js?v=126";
+import { setProductos, initCart, enCarrito, addCart } from "./cart.js?v=126";
+import { ENVIO_DOMICILIO, PERSONALIZACION_PRECIO, PROMO_WEBHOOK, NEGOCIO } from "./config.js?v=126";
+import { iniciarPago, iniciarTransferencia } from "./checkout.js?v=126";
+import { tieneTallas, tallasDe, stockDeTalla, stockTotal, precioTalla, precioDesde, preciosVarian, etiquetaStock, precioAntes } from "./tallas.js?v=126";
+import { onMayoreo, precioHTML, precioMay } from "./mayoreo.js?v=126";
+import { track, trackProducto, cerrarProducto } from "./track.js?v=126";
+import { promotorPorCodigo } from "./promotor.js?v=126";
+import { codigoDe, ponerCodigo, descuentoCodigo, revalidarCodigos } from "./codigos.js?v=126";
 const escH = t => String(t ?? "").replace(/[<>&"']/g, c => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;", "'": "&#39;" }[c]));
 
 const $ = s => document.querySelector(s);
@@ -167,7 +167,7 @@ function render() {
         <h1 class="prod__name">${escH(p.nombre)}</h1>
         <div class="prod__price">${precioLinea} <span>MXN</span></div>
         <span class="stock stock--${st.cls}">${st.txt}</span>
-        <p class="prod__envio">🚚 Envío a todo México: se prepara en 1 a 2 días hábiles y llega en 2 a 5 días hábiles más${p.personalizable === false ? "" : " (si lo pides con nombre y número, unos días más)"}</p>
+        <p class="prod__envio">🚚 Envío a todo México: lo preparamos en 1 a 2 días hábiles y te avisamos cuánto tarda en llegar según tu ubicación${p.personalizable === false ? "" : " (si lo pides con nombre y número, unos días más)"}</p>
         ${tallasBloque}
         ${persoBloque}
         <div class="pd-botones">
@@ -243,6 +243,7 @@ function pintarEntrega() {
     b.style.background = on ? "rgba(232,185,35,.14)" : "#141418";
     b.style.color = on ? "#e8b923" : "#f4f4f5";
   });
+  document.querySelectorAll("#pagoModal .mapa-tienda").forEach(a => { a.hidden = entregaProd !== "tienda"; });
   actualizarTotal();
 }
 
@@ -497,7 +498,7 @@ function ponerDatosParaGoogle(p, precio, stock) {
 const escA = t => String(t ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
 async function abrirAviso(p) {
-  const { conectarFormulario } = await import("./sugerencias.js?v=125");
+  const { conectarFormulario } = await import("./sugerencias.js?v=126");
   document.getElementById("avisoModal")?.remove();
   const m = document.createElement("div");
   m.className = "aviso-modal";
@@ -551,6 +552,7 @@ function abrirPago() {
         <button type="button" class="entrega-op" data-entrega="tienda">Recoger en tienda</button>
         <button type="button" class="entrega-op" data-entrega="domicilio">🏠 A domicilio +${money(ENVIO_DOMICILIO)}</button>
       </div>
+      <a class="mapa-tienda" href="${NEGOCIO.mapa}" target="_blank" rel="noopener" hidden>📍 Cómo llegar a la tienda</a>
       <div class="pago-modal__paso">2. ¿Cómo quieres pagar?</div>
       <div class="pago-modal__ops">
         <button type="button" class="pago-op" data-pago="tarjeta">💳 Tarjeta</button>
