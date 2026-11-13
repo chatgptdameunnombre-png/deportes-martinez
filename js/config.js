@@ -33,7 +33,7 @@ export const NEGOCIO = {
   nombre: "Deportes Martínez",
   claim: "Cumplimos sueños y vestimos campeones",
   ciudad: "",
-  mapa: "https://share.google/LqEL9e0FULMOdLhsu",
+  mapa: "https://maps.app.goo.gl/v75CQcxt3hyvNig86",
   direccion: "",
   telefono: "33 2446 9055",
   horario: "",
