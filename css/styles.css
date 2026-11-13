@@ -1920,3 +1920,9 @@ a.proxi-card:hover { transform: translateY(-4px); border-color: var(--accent); }
 .liga-head--filtro .liga-head__esc:not(.on):hover { opacity: 1; }
 .acc--activo .acc__h { color: var(--accent); }
 .acc--activo .acc__h .arr { color: var(--accent); }
+.filtros-btn { font-size: 14px; }
+.filtros-btn .fcount { min-width: 20px; height: 20px; font-size: 12px; }
+.acc__h { font-size: 16px; padding: 15px 12px; }
+.acc__h .arr { font-size: 13px; }
+.acc__b .opt { font-size: 15px; padding: 8px 12px; }
+.acc--chips .opt { font-size: 14px; padding: 7px 12px; }
