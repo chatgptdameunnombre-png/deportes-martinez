@@ -1,6 +1,6 @@
 /* Sección Noticias de la HOME: slider de banners (una noticia a la vez, foto grande + texto al lado). */
-import { firebaseConfig } from "./config.js?v=136";
-import { fotoMedia } from "./fotos.js?v=136";
+import { firebaseConfig } from "./config.js?v=137";
+import { fotoMedia } from "./fotos.js?v=137";
 
 const FS = `https://firestore.googleapis.com/v1/projects/${firebaseConfig.projectId}/databases/(default)/documents`;
 const KEY = firebaseConfig.apiKey;
@@ -113,3 +113,12 @@ function revelar() {
 }
 
 cargarNoticias();
+
+const mapa = document.querySelector(".map-embed iframe[data-src]");
+if (mapa) {
+  const cargar = () => { if (!mapa.src) mapa.src = mapa.dataset.src; };
+  if ("IntersectionObserver" in window) {
+    const vigia = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { vigia.disconnect(); cargar(); } }, { rootMargin: "400px 0px" });
+    vigia.observe(mapa);
+  } else cargar();
+}
