@@ -1,12 +1,12 @@
-import { catalogoRapido, fotosRapido, guardarCatalogo, productoRapido } from "./catalogo.js?v=130";
-import { setProductos, initCart, enCarrito, addCart } from "./cart.js?v=130";
-import { ENVIO_DOMICILIO, PERSONALIZACION_PRECIO, PROMO_WEBHOOK, NEGOCIO } from "./config.js?v=130";
-import { iniciarPago, iniciarTransferencia } from "./checkout.js?v=130";
-import { tieneTallas, tallasDe, stockDeTalla, stockTotal, precioTalla, precioDesde, preciosVarian, etiquetaStock, precioAntes } from "./tallas.js?v=130";
-import { onMayoreo, precioHTML, precioMay } from "./mayoreo.js?v=130";
-import { track, trackProducto, cerrarProducto } from "./track.js?v=130";
-import { promotorPorCodigo } from "./promotor.js?v=130";
-import { codigoDe, ponerCodigo, descuentoCodigo, revalidarCodigos } from "./codigos.js?v=130";
+import { catalogoRapido, fotosRapido, guardarCatalogo, productoRapido } from "./catalogo.js?v=131";
+import { setProductos, initCart, enCarrito, addCart } from "./cart.js?v=131";
+import { ENVIO_DOMICILIO, PERSONALIZACION_PRECIO, PROMO_WEBHOOK, NEGOCIO } from "./config.js?v=131";
+import { iniciarPago, iniciarTransferencia } from "./checkout.js?v=131";
+import { tieneTallas, tallasDe, stockDeTalla, stockTotal, precioTalla, precioDesde, preciosVarian, etiquetaStock, precioAntes } from "./tallas.js?v=131";
+import { onMayoreo, precioHTML, precioMay } from "./mayoreo.js?v=131";
+import { track, trackProducto, cerrarProducto } from "./track.js?v=131";
+import { promotorPorCodigo } from "./promotor.js?v=131";
+import { codigoDe, ponerCodigo, descuentoCodigo, revalidarCodigos } from "./codigos.js?v=131";
 const escH = t => String(t ?? "").replace(/[<>&"']/g, c => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;", "'": "&#39;" }[c]));
 
 const $ = s => document.querySelector(s);
@@ -499,7 +499,7 @@ function ponerDatosParaGoogle(p, precio, stock) {
 const escA = t => String(t ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
 async function abrirAviso(p) {
-  const { conectarFormulario } = await import("./sugerencias.js?v=130");
+  const { conectarFormulario } = await import("./sugerencias.js?v=131");
   document.getElementById("avisoModal")?.remove();
   const m = document.createElement("div");
   m.className = "aviso-modal";
