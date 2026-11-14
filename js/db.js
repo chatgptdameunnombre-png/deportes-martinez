@@ -1,5 +1,5 @@
-import { firebaseConfig, usaFirebase } from "./config.js?v=138";
-import { PRODUCTOS_SEED } from "./seed.js?v=138";
+import { firebaseConfig, usaFirebase } from "./config.js?v=139";
+import { PRODUCTOS_SEED } from "./seed.js?v=139";
 
 const LS_KEY = "dm_productos";
 const LS_AUTH = "dm_auth";
@@ -11,6 +11,13 @@ if (usaFirebase) {
   impl = await crearImplFirebase();
 } else {
   impl = crearImplDemo();
+}
+
+export function cambioDeStock(p, talla, paso) {
+  if (talla === "Piezas" || !(p.tallaTipo === "tallas" && Array.isArray(p.tallas) && p.tallas.length))
+    return { stock: Math.max(0, Number(p.stock || 0) + paso) };
+  const tallas = p.tallas.map(t => t.talla === talla ? { ...t, stock: Math.max(0, Number(t.stock || 0) + paso) } : t);
+  return { tallas, stock: tallas.reduce((a, t) => a + Number(t.stock || 0), 0) };
 }
 
 function separarFotos(data) {
@@ -74,6 +81,16 @@ async function crearImplFirebase() {
       const { principal, extra } = separarFotos({ oculto: false, ...data, id: ref.id });
       await setDoc(ref, principal);
       await escribirFotos(ref.id, extra);
+    },
+    async ajustarStock(id, talla, paso) {
+      return runTransaction(fdb, async tx => {
+        const ref = refProd(id);
+        const snap = await tx.get(ref);
+        if (!snap.exists()) throw new Error("La playera ya no existe");
+        const patch = cambioDeStock(snap.data(), talla, paso);
+        tx.update(ref, patch);
+        return patch;
+      });
     },
     async updateProduct(id, patch) {
       if ("imagenes" in patch) {
