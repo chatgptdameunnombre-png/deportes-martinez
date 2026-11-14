@@ -1,7 +1,8 @@
-import { db } from "./db.js?v=137";
-import { KIKI_EMAIL, AVISO_WEBHOOK } from "./config.js?v=137";
-import { pintarEstadisticas } from "./estadisticas.js?v=137";
-import "./panel-nav.js?v=137";
+import { db } from "./db.js?v=138";
+import { KIKI_EMAIL, AVISO_WEBHOOK, DUENOS, CUENTA_SISTEMA } from "./config.js?v=138";
+import { iniciarClave } from "./clave-panel.js?v=138";
+import { pintarEstadisticas } from "./estadisticas.js?v=138";
+import { mostrarSeccion } from "./panel-nav.js?v=138";
 
 const $ = s => document.querySelector(s);
 const money = n => "$" + Number(n).toLocaleString("es-MX");
@@ -17,18 +18,24 @@ const MAX_BYTES = 950000;
 let productos = [];
 let inicializado = false;
 let fotosActuales = [];
+let yo = "";
+const CUENTAS_OCULTAS = [CUENTA_SISTEMA, KIKI_EMAIL, "cuentadeprueba@deportesmartinez.mx"];
+const normTxt = t => String(t || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-const OWNER_EMAILS = ["admindeportesmartinez@gmail.com", KIKI_EMAIL];
+const OWNER_EMAILS = [...DUENOS, KIKI_EMAIL];
 const esDueno = u => !!u && OWNER_EMAILS.includes((u.email || "").toLowerCase());
 
 db.onAuth(user => {
   if (!user) { window.location.replace("admin.html"); return; }
   if (!esDueno(user)) { window.location.replace("index.html"); return; }
+  yo = (user.email || "").toLowerCase();
+  if (yo === "josedmartinez1234@gmail.com") $("#hoySaludo").textContent = "Hola, Daniel";
   $("#loader").hidden = true;
   $("#dash").hidden = false;
   const soyKiki = (user.email || "").toLowerCase() === KIKI_EMAIL;
   $("#pnavPromotores").hidden = !soyKiki;
-  if (soyKiki) import("./promotores.js?v=137").then(m => m.iniciarPromotores(db));
+  if (soyKiki) import("./promotores.js?v=138").then(m => m.iniciarPromotores(db));
+  iniciarClave(db, user);
   window.scrollTo(0, 0);
   arrancarDash();
 });
@@ -67,7 +74,7 @@ function ordenar(lista) {
 function render() {
   $("#stTotal").textContent = productos.length;
   $("#stStock").textContent = productos.reduce((a, p) => a + Number(p.stock || 0), 0);
-  $("#stOut").textContent = productos.filter(p => p.stock <= 0).length;
+  $("#stOut").textContent = productos.filter(p => !p.oculto && !p.proximamente && Number(p.stock || 0) <= 0).length;
 
   const DEPORTE_TXT = { futbol: "Futbol", basket: "Basketball", americano: "Americano", beisbol: "Béisbol", f1: "Fórmula 1" };
   const enOrden = ordenar(productos);
@@ -83,7 +90,7 @@ function render() {
   }
 
   const fila = p => `
-    <div class="p-row${p.oculto ? " p-row--oculta" : ""}">
+    <div class="p-row${p.oculto ? " p-row--oculta" : ""}" data-fila="${escHTML(p.id)}">
       <img class="p-thumb" src="${escHTML(p.imagen || '')}" alt="" onerror="this.style.visibility='hidden'">
       <div class="p-name">
         <b>${escHTML(p.nombre)}</b>
@@ -98,6 +105,7 @@ function render() {
       <span class="hide-sm p-cat">${escHTML(p.categoria)}</span>
       <span class="hide-sm p-precio">${money(p.precio)}</span>
       <span>${stockPill(p.stock)}</span>
+      ${controlesStock(p)}
       <div class="p-actions">
         <button class="vis-a" data-vis="${escHTML(p.id)}" title="${p.oculto ? "Mostrarla en la tienda" : "Ocultarla de la tienda sin borrarla"}">${p.oculto ? "Mostrar" : "Ocultar"}</button>
         <button class="edit-a" data-edit="${escHTML(p.id)}">Editar</button>
@@ -105,15 +113,26 @@ function render() {
       </div>
     </div>`;
 
+  const q = normTxt($("#pBuscar")?.value).trim();
+  if (q) {
+    const hallados = buscarPlayeras(q, enOrden);
+    $("#pList").innerHTML = hallados.length
+      ? `<div class="p-hallados">${hallados.length} ${hallados.length === 1 ? "playera" : "playeras"}</div>${hallados.map(fila).join("")}`
+      : sinResultado($("#pBuscar").value.trim());
+    pintarHoy();
+    return;
+  }
+
+  const abiertos = new Set([...document.querySelectorAll("#pList details[open]")].map(d => d.dataset.k));
   /* todo cerrado al entrar: el catálogo es largo y así se ve de un vistazo */
   const html = [...porDeporte.entries()].map(([dep, ligas]) => {
     const cuantos = [...ligas.values()].reduce((a, l) => a + l.length, 0);
     const dentro = [...ligas.entries()].map(([liga, lista]) => `
-      <details class="p-liga">
+      <details class="p-liga" data-k="${escHTML(dep + "|" + liga)}">
         <summary class="p-liga__cab">${escHTML(liga)} <span class="p-cuenta">${lista.length}</span></summary>
         ${lista.map(fila).join("")}
       </details>`).join("");
-    return `<details class="p-dep">
+    return `<details class="p-dep" data-k="${escHTML(dep)}">
       <summary class="p-grupo">
         <span class="p-grupo__txt">${escHTML(DEPORTE_TXT[dep] || dep)}</span>
         <span class="p-cuenta">${cuantos}</span>
@@ -126,8 +145,136 @@ function render() {
   const barra = html
     ? `<div class="p-barra"><button class="p-todas p-todas--all" data-todo="1" type="button">Abrir todo</button></div>`
     : "";
-  $("#pList").innerHTML = (barra + html) || `<div style="padding:40px;text-align:center;color:var(--muted)">Sin jerseys todavía. Agrega el primero.</div>`;
+  $("#pList").innerHTML = (barra + html) || `<div style="padding:40px;text-align:center;color:var(--muted)">Sin playeras todavía. Agrega la primera.</div>`;
+  document.querySelectorAll("#pList details[data-k]").forEach(d => { if (abiertos.has(d.dataset.k)) d.open = true; });
+  pintarHoy();
+  if (!document.querySelector("#hoyRes .p-mm:focus")) pintarHoyBusqueda();
 }
+
+function buscarPlayeras(q, lista) {
+  const palabras = normTxt(q).trim().split(/\s+/).filter(Boolean);
+  return lista.filter(p => {
+    const t = normTxt([p.nombre, p.equipo, p.liga, p.temporada, p.subcategoria, p.marca, p.kit, p.retro ? "retro" : ""].join(" "));
+    return palabras.every(w => t.includes(w));
+  });
+}
+
+function pintarHoyBusqueda() {
+  const caja = $("#hoyRes");
+  const q = ($("#hoyBuscar")?.value || "").trim();
+  if (!caja) return;
+  if (!q) { caja.innerHTML = ""; return; }
+  const hallados = buscarPlayeras(q, ordenar(productos.filter(p => !p.proximamente)));
+  caja.innerHTML = hallados.length
+    ? hallados.slice(0, 10).map(p => `
+      <div class="p-row hoy-fila" data-fila="${escHTML(p.id)}">
+        <img class="p-thumb" src="${escHTML(p.imagen || "")}" alt="" onerror="this.style.visibility='hidden'">
+        <div class="p-name"><b>${escHTML(p.nombre)}</b><span>${p.oculto ? "Oculta en la tienda · " : ""}<span>${stockPill(p.stock)}</span></span></div>
+        ${controlesStock(p)}
+      </div>`).join("") + (hallados.length > 10 ? `<p class="p-hallados">Hay ${hallados.length}. Escribe más para encontrarla, por ejemplo el año.</p>` : "")
+    : sinResultado(q);
+}
+
+function sinResultado(q) {
+  return `<div class="p-nohay">
+      <p>No encontré «${escHTML(q)}». Prueba con el equipo o el año.</p>
+      <p>¿Es una playera nueva?</p>
+      <button type="button" class="btn" data-agregar="${escHTML(q)}">+ Agregar playera</button>
+    </div>`;
+}
+
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-agregar]");
+  if (!b) return;
+  mostrarSeccion("productos");
+  nuevo();
+  const n = $("#pNombre");
+  if (n) { n.value = b.dataset.agregar; n.dispatchEvent(new Event("input")); }
+});
+$("#hoyBuscar")?.addEventListener("input", pintarHoyBusqueda);
+
+function controlesStock(p) {
+  if (p.proximamente) return "";
+  const caja = (talla, n) => `
+    <span class="p-talla${n <= 0 ? " p-talla--cero" : ""}">
+      <b>${escHTML(talla)}</b>
+      <button type="button" class="p-mm" data-stock="-1" data-id="${escHTML(p.id)}" data-talla="${escHTML(talla)}" aria-label="Quitar una ${escHTML(talla)}"${n <= 0 ? " disabled" : ""}>−</button>
+      <span class="p-talla__n">${n}</span>
+      <button type="button" class="p-mm" data-stock="1" data-id="${escHTML(p.id)}" data-talla="${escHTML(talla)}" aria-label="Agregar una ${escHTML(talla)}">+</button>
+    </span>`;
+  if (p.tallaTipo === "tallas" && Array.isArray(p.tallas) && p.tallas.length)
+    return `<div class="p-tallas">${p.tallas.map(t => caja(t.talla, Number(t.stock || 0))).join("")}</div>`;
+  return `<div class="p-tallas">${caja("Piezas", Number(p.stock || 0))}</div>`;
+}
+
+const colaStock = new Map();
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-stock]");
+  if (!b) return;
+  const p = productos.find(x => x.id === b.dataset.id);
+  if (!p) return;
+  const paso = Number(b.dataset.stock);
+  let patch;
+  if (b.dataset.talla === "Piezas" && !(p.tallaTipo === "tallas" && p.tallas?.length)) {
+    const n = Math.max(0, Number(p.stock || 0) + paso);
+    patch = { stock: n };
+  } else {
+    const tallas = (p.tallas || []).map(t => t.talla === b.dataset.talla ? { ...t, stock: Math.max(0, Number(t.stock || 0) + paso) } : t);
+    patch = { tallas, stock: tallas.reduce((a, t) => a + Number(t.stock || 0), 0) };
+  }
+  Object.assign(p, patch);
+  const filaEl = b.closest(".p-row");
+  if (filaEl) {
+    filaEl.querySelector(".p-tallas").outerHTML = controlesStock(p);
+    const pill = filaEl.querySelector(".stock-pill")?.parentElement;
+    if (pill) pill.innerHTML = stockPill(p.stock);
+  }
+  const antes = colaStock.get(p.id) || Promise.resolve();
+  const ahora = antes.then(() => db.updateProduct(p.id, patch))
+    .then(() => toast(`${escHTML(p.nombre)}: ${b.dataset.talla === "Piezas" ? "" : "talla " + escHTML(b.dataset.talla) + " · "}te quedan ${p.stock} en total`))
+    .catch(() => toast("No se pudo guardar. Revisa tu internet y vuelve a intentar."));
+  colaStock.set(p.id, ahora);
+});
+
+$("#pBuscar")?.addEventListener("input", () => render());
+
+function pintarHoy() {
+  const cuerpo = $("#hoyBody");
+  if (!cuerpo) return;
+  const ventas = ventasCargadas || [];
+  const cobrar = ventas.filter(v => v.estado === "por_cobrar").length;
+  const entregar = ventas.filter(v => (v.estado || "pagada") === "pagada").length;
+  const piden = (sugerenciasCargadas || []).filter(s => !s.atendida).length;
+  const agotadas = productos.filter(p => !p.oculto && !p.proximamente && Number(p.stock || 0) <= 0).length;
+  const caja = (n, titulo, sub, ir, urge) => `
+    <button type="button" class="hoy__caja${urge && n ? " hoy__caja--urge" : ""}" data-ir="${ir}">
+      <span class="hoy__n">${n}</span>
+      <span class="hoy__t">${titulo}</span>
+      <span class="hoy__s">${sub}</span>
+    </button>`;
+  const listo = !cobrar && !entregar && !piden;
+  cuerpo.innerHTML = `
+    ${listo ? `<p class="hoy__ok">✓ Todo al día. No tienes nada pendiente.</p>` : `<p class="hoy__ok hoy__ok--pend">Esto es lo que tienes pendiente:</p>`}
+    <div class="hoy__grid">
+      ${caja(cobrar, "Te falta cobrar", cobrar === 1 ? "pedido esperando su pago" : "pedidos esperando su pago", "ventas:por_cobrar", true)}
+      ${caja(entregar, "Por entregar", entregar === 1 ? "pedido pagado" : "pedidos pagados", "ventas:pagada", true)}
+      ${caja(piden, "Te piden", piden === 1 ? "playera que no tienes" : "playeras que no tienes", "piden", true)}
+      ${caja(agotadas, "Agotadas", "en la tienda", "productos", false)}
+    </div>`;
+}
+
+document.addEventListener("click", e => {
+  const ir = e.target.closest("[data-ir]");
+  if (!ir) return;
+  const [sec, tab] = ir.dataset.ir.split(":");
+  mostrarSeccion(sec);
+  if (tab) {
+    vtFiltro = tab;
+    vtTocado = true;
+    document.querySelectorAll(".vt-tab").forEach(t => t.classList.toggle("on", t.dataset.vt === tab));
+    pintarVentas();
+  }
+});
 
 /* ============================================================
    Jerseys de jugador: si ya traen nombre y número estampado,
@@ -368,7 +515,7 @@ const abrir = () => ov.classList.add("open");
 const cerrar = () => ov.classList.remove("open");
 
 function nuevo() {
-  $("#modalTitle").textContent = "Nuevo jersey";
+  $("#modalTitle").textContent = "Nueva playera";
   $("#prodForm").reset();
   $("#pId").value = "";
   fotosActuales = [];
@@ -382,7 +529,7 @@ function nuevo() {
 function editar(id) {
   const p = productos.find(x => x.id === id);
   if (!p) return;
-  $("#modalTitle").textContent = "Editar jersey";
+  $("#modalTitle").textContent = "Editar playera";
   $("#pId").value = p.id;
   $("#pNombre").value = p.nombre;
   $("#pMarca").value = p.marca;
@@ -646,6 +793,7 @@ function comprasDe(uid) {
 }
 
 function pintarClientes(lista) {
+  if (yo !== KIKI_EMAIL) lista = lista.filter(c => (c.email || c.nombre || c.telefono) && !CUENTAS_OCULTAS.includes(String(c.email || "").toLowerCase()));
   const cuerpo = $("#cuentasBody");
   const conDatos = lista.filter(c => c.nombre || c.telefono).length;
   cuerpo.innerHTML = `
@@ -864,6 +1012,7 @@ function pintarVentas() {
   const pendientes = nCobrar + cuenta("pagada");
   const chip = $("#pnavPorCobrar");
   if (chip) { chip.textContent = pendientes; chip.hidden = !pendientes; }
+  pintarHoy();
 
   /* Buscar por folio, nombre o teléfono. Con folio se busca en TODAS las pestañas:
      es la forma de comprobar si un pedido que te dicen por WhatsApp existe de verdad. */
@@ -1288,6 +1437,7 @@ function pintarSugerencias() {
 
   const chip = $("#pnavPiden");
   if (chip) { chip.textContent = pendientes.length; chip.hidden = !pendientes.length; }
+  pintarHoy();
 
   if (!lista.length) {
     cuerpo.innerHTML = `<p class="st-vacio">Todavía nadie ha pedido nada. Aquí van a caer los jerseys que la gente busca y no tienes.</p>`;
@@ -1352,6 +1502,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const p = l.filter(s => !s.atendida).length;
     const chip = $("#pnavPiden");
     if (chip) { chip.textContent = p; chip.hidden = !p; }
+    pintarHoy();
   }).catch(() => { });
 });
 
