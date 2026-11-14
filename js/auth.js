@@ -1,8 +1,8 @@
-import { esperaRestante, anotaFallo, limpiaFallos, esFalloDeClave, textoEspera } from "./clave-segura.js?v=137";
-import { db } from "./db.js?v=137";
-import { EDAD_MINIMA } from "./config.js?v=137";
+import { esperaRestante, anotaFallo, limpiaFallos, esFalloDeClave, textoEspera } from "./clave-segura.js?v=138";
+import { db } from "./db.js?v=138";
+import { EDAD_MINIMA, DUENOS } from "./config.js?v=138";
 
-const OWNER_EMAILS = ["admindeportesmartinez@gmail.com"];
+const OWNER_EMAILS = DUENOS;
 const esDueno = u => !!u && OWNER_EMAILS.includes((u.email || "").toLowerCase());
 let currentUser = null;
 
@@ -300,7 +300,7 @@ else document.addEventListener("DOMContentLoaded", init);
 function aplicarUsuario(u) {
   currentUser = u;
   updateButton();
-  import("./track.js?v=137").then(t => t.setCliente(u?.uid || "", u?.email || "")).catch(() => {});
+  import("./track.js?v=138").then(t => t.setCliente(u?.uid || "", u?.email || "")).catch(() => {});
 }
 
 /* Firebase (~170 KB) baja cuando la página ya se ve, no antes. */
