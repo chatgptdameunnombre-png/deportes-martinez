@@ -1,8 +1,8 @@
-import { db } from "./db.js?v=138";
-import { KIKI_EMAIL, AVISO_WEBHOOK, DUENOS, CUENTA_SISTEMA } from "./config.js?v=138";
-import { iniciarClave } from "./clave-panel.js?v=138";
-import { pintarEstadisticas } from "./estadisticas.js?v=138";
-import { mostrarSeccion } from "./panel-nav.js?v=138";
+import { db, cambioDeStock } from "./db.js?v=139";
+import { KIKI_EMAIL, AVISO_WEBHOOK, DUENOS, CUENTA_SISTEMA } from "./config.js?v=139";
+import { iniciarClave } from "./clave-panel.js?v=139";
+import { pintarEstadisticas } from "./estadisticas.js?v=139";
+import { mostrarSeccion } from "./panel-nav.js?v=139";
 
 const $ = s => document.querySelector(s);
 const money = n => "$" + Number(n).toLocaleString("es-MX");
@@ -34,7 +34,7 @@ db.onAuth(user => {
   $("#dash").hidden = false;
   const soyKiki = (user.email || "").toLowerCase() === KIKI_EMAIL;
   $("#pnavPromotores").hidden = !soyKiki;
-  if (soyKiki) import("./promotores.js?v=138").then(m => m.iniciarPromotores(db));
+  if (soyKiki) import("./promotores.js?v=139").then(m => m.iniciarPromotores(db));
   iniciarClave(db, user);
   window.scrollTo(0, 0);
   arrancarDash();
@@ -52,7 +52,8 @@ async function arrancarDash() {
   cargarPromos();
 }
 
-function stockPill(s) {
+function stockPill(valor) {
+  const s = Number(valor) || 0;
   if (s <= 0) return `<span class="stock-pill" style="color:var(--danger)">Agotado</span>`;
   if (s <= 3) return `<span class="stock-pill" style="color:var(--warn)">${s} · bajo</span>`;
   return `<span class="stock-pill" style="color:var(--ink)">${s}</span>`;
@@ -191,7 +192,8 @@ document.addEventListener("click", e => {
   const n = $("#pNombre");
   if (n) { n.value = b.dataset.agregar; n.dispatchEvent(new Event("input")); }
 });
-$("#hoyBuscar")?.addEventListener("input", pintarHoyBusqueda);
+let esperaHoy;
+$("#hoyBuscar")?.addEventListener("input", () => { clearTimeout(esperaHoy); esperaHoy = setTimeout(pintarHoyBusqueda, 150); });
 
 function controlesStock(p) {
   if (p.proximamente) return "";
@@ -214,29 +216,33 @@ document.addEventListener("click", e => {
   const p = productos.find(x => x.id === b.dataset.id);
   if (!p) return;
   const paso = Number(b.dataset.stock);
-  let patch;
-  if (b.dataset.talla === "Piezas" && !(p.tallaTipo === "tallas" && p.tallas?.length)) {
-    const n = Math.max(0, Number(p.stock || 0) + paso);
-    patch = { stock: n };
-  } else {
-    const tallas = (p.tallas || []).map(t => t.talla === b.dataset.talla ? { ...t, stock: Math.max(0, Number(t.stock || 0) + paso) } : t);
-    patch = { tallas, stock: tallas.reduce((a, t) => a + Number(t.stock || 0), 0) };
-  }
-  Object.assign(p, patch);
+  const talla = b.dataset.talla;
   const filaEl = b.closest(".p-row");
-  if (filaEl) {
+  const pintarFila = () => {
+    if (!filaEl) return;
     filaEl.querySelector(".p-tallas").outerHTML = controlesStock(p);
     const pill = filaEl.querySelector(".stock-pill")?.parentElement;
     if (pill) pill.innerHTML = stockPill(p.stock);
-  }
+  };
+  Object.assign(p, cambioDeStock(p, talla, paso));
+  pintarFila();
   const antes = colaStock.get(p.id) || Promise.resolve();
-  const ahora = antes.then(() => db.updateProduct(p.id, patch))
-    .then(() => toast(`${escHTML(p.nombre)}: ${b.dataset.talla === "Piezas" ? "" : "talla " + escHTML(b.dataset.talla) + " · "}te quedan ${p.stock} en total`))
-    .catch(() => toast("No se pudo guardar. Revisa tu internet y vuelve a intentar."));
+  const ahora = antes.then(() => db.ajustarStock(p.id, talla, paso))
+    .then(real => {
+      Object.assign(p, real);
+      pintarFila();
+      toast(`${escHTML(p.nombre)}: ${talla === "Piezas" ? "" : "talla " + escHTML(talla) + " · "}te quedan ${p.stock} en total`);
+    })
+    .catch(() => {
+      Object.assign(p, cambioDeStock(p, talla, -paso));
+      pintarFila();
+      toast("No se pudo guardar. Revisa tu internet y vuelve a intentar.");
+    });
   colaStock.set(p.id, ahora);
 });
 
-$("#pBuscar")?.addEventListener("input", () => render());
+let esperaBusca;
+$("#pBuscar")?.addEventListener("input", () => { clearTimeout(esperaBusca); esperaBusca = setTimeout(render, 150); });
 
 function pintarHoy() {
   const cuerpo = $("#hoyBody");
@@ -1024,9 +1030,9 @@ function pintarVentas() {
       String(v.telefono || "").replace(/\D/g, "").includes(q.replace(/\D/g, "")) && q.replace(/\D/g, "").length >= 4
     );
     cuerpo.innerHTML = hallados.length
-      ? `<div class="vt-aviso">Encontré <b>${hallados.length}</b> ${hallados.length === 1 ? "pedido" : "pedidos"} con «${vtBusca}».</div>` +
+      ? `<div class="vt-aviso">Encontré <b>${hallados.length}</b> ${hallados.length === 1 ? "pedido" : "pedidos"} con «${escHTML(vtBusca)}».</div>` +
         hallados.map(vtFila).join("")
-      : `<div class="vt-aviso vt-aviso--malo">No hay ningún pedido con «${vtBusca}».
+      : `<div class="vt-aviso vt-aviso--malo">No hay ningún pedido con «${escHTML(vtBusca)}».
            Si alguien te dio ese número, <b>no es un pedido real</b> de tu tienda.</div>`;
     return;
   }
