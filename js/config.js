@@ -28,6 +28,9 @@ export const BORRAR_CUENTA_WEBHOOK = "https://n8n.srv1473142.hstgr.cloud/webhook
 
 export const EDAD_MINIMA = 18;
 export const KIKI_EMAIL = "tuagentedeia.com@gmail.com";
+/* la usa n8n para registrar ventas: nadie le cambia la contraseña */
+export const CUENTA_SISTEMA = "admindeportesmartinez@gmail.com";
+export const DUENOS = [CUENTA_SISTEMA, "josedmartinez1234@gmail.com"];
 
 export const NEGOCIO = {
   nombre: "Deportes Martínez",
