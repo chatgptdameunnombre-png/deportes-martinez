@@ -1,13 +1,13 @@
-import { catalogoRapido, fotosRapido, guardarCatalogo, productoRapido } from "./catalogo.js?v=137";
-import { setProductos, initCart, enCarrito, addCart } from "./cart.js?v=137";
-import { ENVIO_DOMICILIO, PERSONALIZACION_PRECIO, PROMO_WEBHOOK, NEGOCIO } from "./config.js?v=137";
-import { iniciarPago, iniciarTransferencia } from "./checkout.js?v=137";
-import { tieneTallas, tallasDe, stockDeTalla, stockTotal, precioTalla, precioDesde, preciosVarian, etiquetaStock, precioAntes } from "./tallas.js?v=137";
-import { onMayoreo, precioHTML, precioMay } from "./mayoreo.js?v=137";
-import { track, trackProducto, cerrarProducto } from "./track.js?v=137";
-import { promotorPorCodigo } from "./promotor.js?v=137";
-import { codigoDe, ponerCodigo, descuentoCodigo, revalidarCodigos } from "./codigos.js?v=137";
-import { fotoMedia } from "./fotos.js?v=137";
+import { catalogoRapido, fotosRapido, guardarCatalogo, productoRapido } from "./catalogo.js?v=138";
+import { setProductos, initCart, enCarrito, addCart } from "./cart.js?v=138";
+import { ENVIO_DOMICILIO, PERSONALIZACION_PRECIO, PROMO_WEBHOOK, NEGOCIO } from "./config.js?v=138";
+import { iniciarPago, iniciarTransferencia } from "./checkout.js?v=138";
+import { tieneTallas, tallasDe, stockDeTalla, stockTotal, precioTalla, precioDesde, preciosVarian, etiquetaStock, precioAntes } from "./tallas.js?v=138";
+import { onMayoreo, precioHTML, precioMay } from "./mayoreo.js?v=138";
+import { track, trackProducto, cerrarProducto } from "./track.js?v=138";
+import { promotorPorCodigo } from "./promotor.js?v=138";
+import { codigoDe, ponerCodigo, descuentoCodigo, revalidarCodigos } from "./codigos.js?v=138";
+import { fotoMedia } from "./fotos.js?v=138";
 const escH = t => String(t ?? "").replace(/[<>&"']/g, c => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;", "'": "&#39;" }[c]));
 
 const $ = s => document.querySelector(s);
@@ -500,7 +500,7 @@ function ponerDatosParaGoogle(p, precio, stock) {
 const escA = t => String(t ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
 async function abrirAviso(p) {
-  const { conectarFormulario } = await import("./sugerencias.js?v=137");
+  const { conectarFormulario } = await import("./sugerencias.js?v=138");
   document.getElementById("avisoModal")?.remove();
   const m = document.createElement("div");
   m.className = "aviso-modal";
@@ -512,7 +512,7 @@ async function abrirAviso(p) {
       <p class="aviso-modal__p">Déjanos tu WhatsApp y te escribimos en cuanto llegue.</p>
       <form class="sug" data-deporte="${escA(p.categoria || "")}" autocomplete="off">
         <label class="sug__lb" for="avisoTexto">Jersey</label>
-        <input class="sug__in" id="avisoTexto" name="texto" maxlength="200" required value="${escA(("Avísame cuando llegue: " + p.nombre).slice(0, 200))}">
+        <input class="sug__in" id="avisoTexto" name="texto" maxlength="200" required value="${escA(String(p.nombre || "").slice(0, 200))}">
         <label class="sug__lb" for="avisoTalla">Talla <span>(opcional)</span></label>
         <select class="sug__in" id="avisoTalla" name="talla"><option value="">Sin talla</option><option value="S">S</option><option value="M">M</option><option value="L">L</option><option value="XL">XL</option><option value="2XL">2XL</option><option value="3XL">3XL</option><option value="4XL">4XL</option><option value="Niño">Niño</option></select>
         <label class="sug__lb" for="avisoNombre">Tu nombre <span>(opcional)</span></label>
