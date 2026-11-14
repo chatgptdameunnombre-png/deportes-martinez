@@ -9,7 +9,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Manrope:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap">
-  <link rel="stylesheet" href="css/styles.css?v=137">
+  <link rel="stylesheet" href="css/styles.css?v=138">
+  <link rel="stylesheet" href="css/panel-glass.css?v=138">
 </head>
 <body class="admin-body">
 
@@ -33,8 +34,9 @@
         <img src="fotos/logo/iso-blanco.png" alt="">
         <span><b>Deportes Martínez</b><small>Panel del dueño</small></span>
       </div>
+      <button class="pnav__item" data-sec="hoy"><span class="pnav__ico">🏠</span>Hoy</button>
       <button class="pnav__item" data-sec="ventas"><span class="pnav__ico">🧾</span>Ventas <span class="pnav__badge" id="pnavPorCobrar" hidden>0</span></button>
-      <button class="pnav__item" data-sec="productos"><span class="pnav__ico">👕</span>Mis jerseys</button>
+      <button class="pnav__item" data-sec="productos"><span class="pnav__ico">👕</span>Mis playeras</button>
       <button class="pnav__item" data-sec="visitas"><span class="pnav__ico">📊</span>Estadísticas</button>
       <button class="pnav__item" data-sec="asistente"><span class="pnav__ico">💬</span>Asistente</button>
       <button class="pnav__item" data-sec="piden"><span class="pnav__ico">🙋</span>Lo que piden <span class="pnav__badge" id="pnavPiden" hidden>0</span></button>
@@ -42,32 +44,50 @@
       <button class="pnav__item" data-sec="cuentas"><span class="pnav__ico">👥</span>Cuentas de clientes</button>
       <button class="pnav__item" data-sec="promotores" id="pnavPromotores" hidden><span class="pnav__ico">📣</span>Promotores</button>
       <div class="pnav__sep"></div>
-      <button class="pnav__item pnav__item--accion" data-sec="agregar"><span class="pnav__ico">＋</span>Agregar jersey</button>
+      <button class="pnav__item pnav__item--accion" data-sec="agregar"><span class="pnav__ico">＋</span>Agregar playera</button>
       <div class="pnav__pie">
+        <button class="pnav__item" id="pnavClave" hidden><span class="pnav__ico">🔑</span>Cambiar contraseña</button>
         <button class="pnav__item pnav__item--salir" id="logout"><span class="pnav__ico">↩</span>Cerrar sesión</button>
       </div>
     </aside>
     <div class="pnav-fondo" id="pnavFondo" hidden></div>
 
     <main class="admin-main">
+      <section class="psec" id="secHoy" hidden>
+        <div class="admin-head"><h1 id="hoySaludo">Hoy</h1></div>
+        <div class="hoy" id="hoyBody"><p class="st-vacio">Cargando…</p></div>
+        <h2 class="hoy__h">Cambiar inventario</h2>
+        <label class="p-buscar">
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 20l-4.2-4.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <input id="hoyBuscar" type="search" autocomplete="off" placeholder="Busca la playera que vendiste o te llegó" aria-label="Buscar playera para cambiar inventario">
+        </label>
+        <div id="hoyRes"></div>
+      </section>
+
       <div class="psec" id="secProductos" hidden>
       <div class="admin-head">
-        <h1>Mis jerseys</h1>
+        <h1>Mis playeras</h1>
         <div style="display:flex;gap:10px;flex-wrap:wrap">
           <button class="btn btn--ghost" id="optBtn" style="width:auto">⚡ Optimizar fotos</button>
-          <button class="btn" id="addBtn" style="width:auto">+ Agregar jersey</button>
+          <button class="btn" id="addBtn" style="width:auto">+ Agregar playera</button>
         </div>
       </div>
 
-      <div class="stat-row">
-        <div class="stat"><div class="n" id="stTotal">0</div><div class="l">Jerseys</div></div>
-        <div class="stat"><div class="n" id="stStock">0</div><div class="l">Unidades en stock</div></div>
-        <div class="stat"><div class="n" id="stOut">0</div><div class="l">Agotados</div></div>
+      <label class="p-buscar">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 20l-4.2-4.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <input id="pBuscar" type="search" autocomplete="off" placeholder="Busca tu playera: chivas, mexico, retro…" aria-label="Buscar playera">
+      </label>
+      <p class="p-ayuda">Vendiste una: pícale <b>−</b> a la talla. Te llegó una: pícale <b>+</b>. Se guarda solo.</p>
+
+      <div class="stat-row p-stats">
+        <div class="stat"><div class="n" id="stTotal">0</div><div class="l">Playeras</div></div>
+        <div class="stat"><div class="n" id="stStock">0</div><div class="l">Piezas que tienes</div></div>
+        <div class="stat"><div class="n" id="stOut">0</div><div class="l">Agotadas en la tienda</div></div>
       </div>
 
       <div class="p-table">
         <div class="p-row p-row--head">
-          <span></span><span>Jersey</span><span class="hide-sm">Deporte</span>
+          <span></span><span>Playera</span><span class="hide-sm">Deporte</span>
           <span class="hide-sm">Precio</span><span>Stock</span><span></span>
         </div>
         <div id="pList"></div>
@@ -171,7 +191,7 @@
   <div class="modal-ov" id="modalOv">
     <div class="modal">
       <div class="modal__head">
-        <h3 id="modalTitle">Nuevo jersey</h3>
+        <h3 id="modalTitle">Nueva playera</h3>
         <button class="icon-btn" id="modalClose">✕</button>
       </div>
       <form id="prodForm">
@@ -242,6 +262,31 @@
     </div>
   </div>
 
+  <div class="modal-ov" id="claveOv">
+    <div class="modal clave-caja">
+      <div class="modal__head">
+        <h3 id="claveTtl">Cambiar contraseña</h3>
+        <button class="icon-btn" id="claveCerrar" type="button">✕</button>
+      </div>
+      <div class="modal__body">
+        <p class="clave-sub" id="claveSub"></p>
+        <div class="field"><label for="claveAct" id="claveActLbl">Tu contraseña de hoy</label><input class="input" id="claveAct" type="password" autocomplete="current-password"></div>
+        <div class="field"><label for="claveNueva">Contraseña nueva</label><input class="input" id="claveNueva" type="password" autocomplete="new-password"></div>
+        <ul class="clave-reglas" id="claveReglas">
+          <li data-r="largo">8 caracteres o más</li>
+          <li data-r="mayus">Una mayúscula</li>
+          <li data-r="num">Un número</li>
+        </ul>
+        <div class="field"><label for="claveOtra">Escríbela otra vez</label><input class="input" id="claveOtra" type="password" autocomplete="new-password"></div>
+        <p class="clave-err" id="claveErr" hidden></p>
+      </div>
+      <div class="modal__foot">
+        <button type="button" class="btn btn--ghost" id="claveCancelar">Cancelar</button>
+        <button type="button" class="btn btn--accent" id="claveGuardar" style="width:auto" disabled>Guardar mi contraseña</button>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-ov" id="promoOv">
     <div class="modal">
       <div class="modal__head">
@@ -307,6 +352,6 @@
   </div>
 
   <div class="toast-wrap" id="toasts"></div>
-  <script type="module" src="js/panel.js?v=137"></script>
+  <script type="module" src="js/panel.js?v=138"></script>
 </body>
 </html>
