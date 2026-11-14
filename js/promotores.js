@@ -1,5 +1,5 @@
-import { limpiarSlug } from "./promotor.js?v=138";
-import { tiempo, hace, sinRepetidos, tarjeta, barra, bloque } from "./estadisticas.js?v=138";
+import { limpiarSlug } from "./promotor.js?v=139";
+import { tiempo, hace, sinRepetidos, tarjeta, barra, bloque } from "./estadisticas.js?v=139";
 
 const $ = s => document.querySelector(s);
 const esc = t => String(t ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -183,7 +183,7 @@ async function crear(e) {
 export function iniciarPromotores(base) {
   db = base;
   $("#prmForm")?.addEventListener("submit", crear);
-  $("#prmCodigo")?.addEventListener("input", e => { e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ""); });
+  $("#prmCodigo")?.addEventListener("input", e => { e.target.value = e.target.value.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Z0-9]/g, ""); });
   document.addEventListener("panel:seccion", e => { if (e.detail?.sec === "promotores") cargar(); });
   document.addEventListener("change", e => { if (e.target.id === "prmFiltro") { filtro = e.target.value; pintarVisitas(); } });
   document.addEventListener("click", async e => {
@@ -206,11 +206,7 @@ export function iniciarPromotores(base) {
       bv.disabled = true;
       try {
         await db.borrarSesion(bv.dataset.prmBorrar);
-        const sv = datos.visitas.find(x => x.id === bv.dataset.prmBorrar);
-        const f = sv && datos.filas.find(x => x.slug === sv.promotor);
-        if (f) f.visitas = Math.max(0, f.visitas - 1);
-        datos.visitas = datos.visitas.filter(x => x.id !== bv.dataset.prmBorrar);
-        pintar();
+        cargar();
       } catch (x) { bv.disabled = false; alert("No se pudo borrar: " + (x?.code || x?.message || x)); }
       return;
     }
