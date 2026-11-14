@@ -131,3 +131,12 @@
 .p-nohay p { margin: 0 0 8px; font-size: 17px; color: var(--ink-soft); }
 .p-nohay p + p { color: var(--ink); font-weight: 700; margin-bottom: 14px; }
 .p-nohay .btn { width: auto; }
+
+@media (max-width: 760px) {
+  .admin-body::before { animation: none; }
+  .admin-body .stat, .admin-body .st-cubo, .admin-body .vt-grupo, .admin-body .vt-card, .admin-body .pd-card,
+  .admin-body .prm__card, .admin-body .st-visita, .admin-body .st-fila, .admin-body .st-aparato, .admin-body .st-top1,
+  .admin-body .p-table, .admin-body .vt-aviso, .admin-body .st-bloque, .hoy__caja, .p-buscar {
+    -webkit-backdrop-filter: none; backdrop-filter: none;
+  }
+}
