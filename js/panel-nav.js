@@ -4,8 +4,9 @@
 const $ = s => document.querySelector(s);
 
 const SECCIONES = {
+  hoy: { sel: "#secHoy", titulo: "Hoy" },
   ventas: { sel: "#secVentas", titulo: "Ventas" },
-  productos: { sel: "#secProductos", titulo: "Mis jerseys" },
+  productos: { sel: "#secProductos", titulo: "Mis playeras" },
   visitas: { sel: "#estad", titulo: "Estadísticas" },
   asistente: { sel: "#secAsistente", titulo: "Asistente" },
   piden: { sel: "#secPiden", titulo: "Lo que piden" },
@@ -18,7 +19,7 @@ const LS_SEC = "dm_panel_sec";
 const esAncho = () => window.matchMedia("(min-width: 1000px)").matches;
 
 export function mostrarSeccion(sec) {
-  if (!SECCIONES[sec]) sec = "ventas";
+  if (!SECCIONES[sec]) sec = "hoy";
 
   for (const [k, s] of Object.entries(SECCIONES)) {
     const el = $(s.sel);
@@ -68,9 +69,7 @@ function conectar() {
   document.addEventListener("keydown", e => { if (e.key === "Escape") cerrarNav(); });
   window.addEventListener("resize", () => { if (esAncho()) cerrarNav(); });
 
-  let guardada = "ventas";
-  try { guardada = localStorage.getItem(LS_SEC) || "ventas"; } catch { }
-  mostrarSeccion(guardada);
+  mostrarSeccion("hoy");
 }
 
 if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", conectar);
