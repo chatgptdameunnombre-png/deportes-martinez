@@ -140,3 +140,22 @@
     -webkit-backdrop-filter: none; backdrop-filter: none;
   }
 }
+
+#hoyRes .p-tallas { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+#hoyRes .p-talla { justify-content: space-between; }
+.hoy-acciones { display: flex; flex-wrap: wrap; gap: 10px; }
+.hoy-acciones .btn { width: auto; flex: 1 1 160px; }
+.hoy-oculta, .hoy-visible { display: block; margin-top: 4px; font-size: 15px; font-weight: 700; }
+.hoy-oculta { color: #ff9b9b; }
+.hoy-visible { color: var(--accent); }
+#hoyRes .hoy-fila--oculta { border-color: rgba(255,120,120,.35) !important; }
+
+#hoyRes .hoy-fila { display: flex !important; flex-direction: column; align-items: stretch; gap: 12px; }
+#hoyRes .hoy-top { display: flex; gap: 12px; align-items: center; }
+#hoyRes .hoy-top .p-thumb { flex: 0 0 64px; }
+#hoyRes .p-tallas { margin-top: 0; }
+#hoyRes .p-name > .hoy-oculta { color: #ff9b9b; }
+#hoyRes .p-name > .hoy-visible { color: var(--accent); }
+
+.hoy-acciones { flex-direction: column; }
+.hoy-acciones .btn { width: 100%; flex: none; }
