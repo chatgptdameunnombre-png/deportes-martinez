@@ -1,4 +1,4 @@
-import { firebaseConfig, CUENTA_SISTEMA, KIKI_EMAIL } from "./config.js?v=138";
+import { firebaseConfig, CUENTA_SISTEMA, KIKI_EMAIL } from "./config.js?v=139";
 
 const IDT = "https://identitytoolkit.googleapis.com/v1/accounts";
 const $ = s => document.querySelector(s);
@@ -55,9 +55,15 @@ async function guardar() {
   try {
     const d = await pedir("signInWithPassword", { email: correo, password: act, returnSecureToken: true }).catch(() => { throw new Error("actual"); });
     await pedir("update", { idToken: d.idToken, password: nueva, returnSecureToken: true });
-    await db.login(correo, nueva).catch(() => {});
     forzada = false;
     $("#claveOv").classList.remove("open");
+    const sigue = await db.login(correo, nueva).then(() => true, () => false);
+    if (!sigue) {
+      alert("Tu contraseña ya cambió. Entra otra vez con la nueva.");
+      await db.logout().catch(() => {});
+      location.replace("admin.html");
+      return;
+    }
     alert("Listo, ya tienes tu contraseña nueva.");
   } catch (e) {
     const m = String(e.message || "");
@@ -81,10 +87,15 @@ export async function iniciarClave(base, user) {
   ["claveAct", "claveNueva", "claveOtra"].forEach(id => $("#" + id).addEventListener("input", revisar));
   $("#claveGuardar").onclick = guardar;
   if (correo === KIKI_EMAIL) return;
-  try {
-    const d = await pedir("lookup", { idToken: await db.token() });
-    const u = (d.users || [])[0] || {};
-    const creada = +u.createdAt || 0, cambiada = +u.passwordUpdatedAt || 0;
-    if (creada && Math.abs(cambiada - creada) < 60000) abrir(true);
-  } catch (_) {}
+  for (let intento = 0; intento < 3; intento++) {
+    try {
+      const d = await pedir("lookup", { idToken: await db.token() });
+      const u = (d.users || [])[0] || {};
+      const creada = +u.createdAt || 0, cambiada = +u.passwordUpdatedAt || 0;
+      if (creada && Math.abs(cambiada - creada) < 60000) abrir(true);
+      return;
+    } catch (_) {
+      await new Promise(r => setTimeout(r, 2000 * (intento + 1)));
+    }
+  }
 }
