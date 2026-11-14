@@ -1,4 +1,4 @@
-import { firebaseConfig } from "./config.js?v=140";
+import { firebaseConfig } from "./config.js?v=141";
 
 const $ = s => document.querySelector(s);
 const PROJ = firebaseConfig.projectId;
@@ -529,7 +529,7 @@ export function pintarLista(list) {
 
     ${bloque("Por dónde se sale la gente", embudo(r), "embudo")}
 
-    ${bloque("Los jerseys que más miran", podio(top), "vistos")}
+    ${bloque("Los jerseys que más observan", podio(top), "vistos")}
 
     ${bloque("Tallas que más eligen",
       Object.keys(r.tallas).length ? listaBarras(r.tallas, r.visitas) : vacio("Todavía nadie ha elegido talla."), "tallas")}
