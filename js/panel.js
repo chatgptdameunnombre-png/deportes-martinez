@@ -1,8 +1,8 @@
-import { db, cambioDeStock } from "./db.js?v=140";
-import { KIKI_EMAIL, AVISO_WEBHOOK, DUENOS, CUENTA_SISTEMA } from "./config.js?v=140";
-import { iniciarClave } from "./clave-panel.js?v=140";
-import { pintarEstadisticas } from "./estadisticas.js?v=140";
-import { mostrarSeccion } from "./panel-nav.js?v=140";
+import { db, cambioDeStock } from "./db.js?v=141";
+import { KIKI_EMAIL, AVISO_WEBHOOK, DUENOS, CUENTA_SISTEMA } from "./config.js?v=141";
+import { iniciarClave } from "./clave-panel.js?v=141";
+import { pintarEstadisticas } from "./estadisticas.js?v=141";
+import { mostrarSeccion } from "./panel-nav.js?v=141";
 
 const $ = s => document.querySelector(s);
 const money = n => "$" + Number(n).toLocaleString("es-MX");
@@ -34,7 +34,7 @@ db.onAuth(user => {
   $("#dash").hidden = false;
   const soyKiki = (user.email || "").toLowerCase() === KIKI_EMAIL;
   $("#pnavPromotores").hidden = !soyKiki;
-  if (soyKiki) import("./promotores.js?v=140").then(m => m.iniciarPromotores(db));
+  if (soyKiki) import("./promotores.js?v=141").then(m => m.iniciarPromotores(db));
   iniciarClave(db, user);
   window.scrollTo(0, 0);
   arrancarDash();
@@ -272,9 +272,9 @@ function pintarHoy() {
   cuerpo.innerHTML = `
     ${listo ? `<p class="hoy__ok">✓ Todo al día. No tienes nada pendiente.</p>` : `<p class="hoy__ok hoy__ok--pend">Esto es lo que tienes pendiente:</p>`}
     <div class="hoy__grid">
-      ${caja(cobrar, "Te falta cobrar", cobrar === 1 ? "pedido esperando su pago" : "pedidos esperando su pago", "ventas:por_cobrar", true)}
+      ${caja(cobrar, "Revisar transferencia", cobrar === 1 ? "pedido por confirmar" : "pedidos por confirmar", "ventas:por_cobrar", true)}
       ${caja(entregar, "Por entregar", entregar === 1 ? "pedido pagado" : "pedidos pagados", "ventas:pagada", true)}
-      ${caja(piden, "Te piden", piden === 1 ? "playera que no tienes" : "playeras que no tienes", "piden", true)}
+      ${caja(piden, "Pedidos de la gente", piden === 1 ? "playera que no tienes" : "playeras que no tienes", "piden", true)}
       ${caja(agotadas, "Agotadas", "en la tienda", "productos", false)}
     </div>`;
 }
