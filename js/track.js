@@ -1,6 +1,6 @@
-import { firebaseConfig, usaFirebase } from "./config.js?v=138";
-import { permiteMedicion } from "./cookies.js?v=138";
-import { promotorActual } from "./promotor.js?v=138";
+import { firebaseConfig, usaFirebase } from "./config.js?v=139";
+import { permiteMedicion } from "./cookies.js?v=139";
+import { promotorActual } from "./promotor.js?v=139";
 
 const KEY = firebaseConfig.apiKey;
 const PROJ = firebaseConfig.projectId;
@@ -103,7 +103,9 @@ function leerGuardada() {
       const g = JSON.parse(almacen.getItem(SS_SES) || "null");
       if (!g || !g.id) continue;
       const quieto = Date.now() - (g.ultimoUso || 0);
-      const deVueltaDePagar = g.pagando && Date.now() - g.pagando < VIDA_SESION;
+      const q = new URLSearchParams(location.search);
+      const conPago = q.has("collection_status") || q.has("status") || q.has("payment_id");
+      const deVueltaDePagar = conPago && g.pagando && Date.now() - g.pagando < VIDA_SESION;
       if (!g.ultimoUso || quieto < PAUSA_NUEVA || (deVueltaDePagar && quieto < VIDA_SESION)) return g;
     } catch { }
   }
@@ -120,6 +122,8 @@ function cargarSesion() {
       return g;
     }
   } catch { }
+  pendientes = [];
+  try { localStorage.removeItem("dm_track_pend"); } catch { }
   return {
     id: nuevoId(),
     inicio: new Date().toISOString(),
@@ -174,8 +178,32 @@ function tic() {
   if (ahora - ultimoGuardadoTic >= 10000) { ultimoGuardadoTic = ahora; guardarLocal(); }
 }
 
+function visitaNueva() {
+  enviar(true);
+  const antes = ses;
+  ses = {
+    id: nuevoId(),
+    inicio: new Date().toISOString(),
+    dispositivo: antes.dispositivo,
+    origen: "regreso",
+    entrada: pagina(),
+    paginas: [pagina()],
+    productos: {}, busquedas: [], sinResultado: [], tallas: [],
+    segundos: 0, compro: false, clienteUid: antes.clienteUid || "", clienteEmail: antes.clienteEmail || "",
+    nombreCliente: "", refPedido: "", refPedidos: [], promotor: ""
+  };
+  pendientes = [];
+  guardarPendientes();
+  sucio = true;
+  guardarLocal();
+}
+
+const despierta = () => {
+  if (ses && permiteMedicion() && Date.now() - ultimaAccion > PAUSA_NUEVA) visitaNueva();
+  ultimaAccion = Date.now();
+};
 ["mousemove", "keydown", "scroll", "click", "touchstart", "pointerdown"].forEach(ev =>
-  window.addEventListener(ev, () => { ultimaAccion = Date.now(); }, { passive: true, capture: true }));
+  window.addEventListener(ev, despierta, { passive: true, capture: true }));
 
 /* ============ Firestore ============ */
 function val(v) {
@@ -397,7 +425,7 @@ setTimeout(() => enviar(), 3500);
 
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "hidden") { tic(); enviar(true); }
-  else { ultimoTic = Date.now(); ultimaAccion = Date.now(); }
+  else { ultimoTic = Date.now(); despierta(); }
 });
 window.addEventListener("pagehide", () => { tic(); enviar(true); });
 window.addEventListener("pageshow", () => { ultimoTic = Date.now(); });
