@@ -1,5 +1,5 @@
-import { limpiarSlug } from "./promotor.js?v=137";
-import { tiempo, hace, sinRepetidos, tarjeta, barra, bloque } from "./estadisticas.js?v=137";
+import { limpiarSlug } from "./promotor.js?v=138";
+import { tiempo, hace, sinRepetidos, tarjeta, barra, bloque } from "./estadisticas.js?v=138";
 
 const $ = s => document.querySelector(s);
 const esc = t => String(t ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -39,7 +39,10 @@ function visitaHTML(s, nombres) {
     <div class="st-visita__cuerpo">
       ${vio.length ? `Vio: ${vio.slice(0, 6).map(esc).join(", ")}${vio.length > 6 ? "…" : ""}` : "No abrió ningún jersey."}
       ${s.ventas.length ? `<br>Pedido ${s.ventas.map(v => `<b>${esc(v.folio || v.id)}</b>`).join(", ")}` : ""}
-      ${(s.eventos || []).length ? `<div class="st-visita__acciones"><button class="btn btn--ghost" data-prm-pasos="${esc(s.id)}">Ver qué hizo paso a paso</button></div>` : ""}
+      <div class="st-visita__acciones">
+        ${(s.eventos || []).length ? `<button class="btn btn--ghost" data-prm-pasos="${esc(s.id)}">Ver qué hizo paso a paso</button>` : ""}
+        <button class="btn btn--danger" data-prm-borrar="${esc(s.id)}">Borrar esta visita</button>
+      </div>
     </div>
   </details>`;
 }
@@ -193,8 +196,22 @@ export function iniciarPromotores(base) {
     if (pa) {
       const s = datos.visitas.find(x => x.id === pa.dataset.prmPasos);
       const cont = pa.closest(".st-visita__cuerpo");
-      pa.parentElement.remove();
+      pa.remove();
       cont.insertAdjacentHTML("beforeend", `<ul class="st-pasos">${sinRepetidos(s?.eventos || []).map(t => `<li>${t}</li>`).join("")}</ul>`);
+      return;
+    }
+    const bv = e.target.closest("[data-prm-borrar]");
+    if (bv) {
+      if (!confirm("¿Borrar esta visita? Ya no se cuenta para ningún promotor.")) return;
+      bv.disabled = true;
+      try {
+        await db.borrarSesion(bv.dataset.prmBorrar);
+        const sv = datos.visitas.find(x => x.id === bv.dataset.prmBorrar);
+        const f = sv && datos.filas.find(x => x.slug === sv.promotor);
+        if (f) f.visitas = Math.max(0, f.visitas - 1);
+        datos.visitas = datos.visitas.filter(x => x.id !== bv.dataset.prmBorrar);
+        pintar();
+      } catch (x) { bv.disabled = false; alert("No se pudo borrar: " + (x?.code || x?.message || x)); }
       return;
     }
     const fi = e.target.closest("[data-prm-filtro]");
