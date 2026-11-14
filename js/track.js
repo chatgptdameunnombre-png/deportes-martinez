@@ -1,6 +1,6 @@
-import { firebaseConfig, usaFirebase } from "./config.js?v=137";
-import { permiteMedicion } from "./cookies.js?v=137";
-import { promotorActual } from "./promotor.js?v=137";
+import { firebaseConfig, usaFirebase } from "./config.js?v=138";
+import { permiteMedicion } from "./cookies.js?v=138";
+import { promotorActual } from "./promotor.js?v=138";
 
 const KEY = firebaseConfig.apiKey;
 const PROJ = firebaseConfig.projectId;
@@ -9,6 +9,8 @@ const LS_ID = "dm_track_id";
 const SS_SES = "dm_track_ses";
 const LS_PEND = "dm_track_pend";
 const VIDA_SESION = 3 * 3600e3;   // 3 h: aguanta el viaje a Mercado Pago y la vuelta
+const PAUSA_NUEVA = 30 * 60e3;     // 30 min sin hacer nada = visita nueva (salvo que regrese de pagar)
+const SALTO_MAX = 6;               // un tic nunca suma más de esto: el teléfono dormido no cuenta
 const MAX_EVENTOS = 120;          // los que se guardan en la nube (los últimos)
 const INACTIVO_MS = 45000;        // sin tocar nada 45 s = ya no está mirando
 let ultimoGuardadoTic = 0;
@@ -99,7 +101,10 @@ function leerGuardada() {
   for (const almacen of [localStorage, sessionStorage]) {
     try {
       const g = JSON.parse(almacen.getItem(SS_SES) || "null");
-      if (g && g.id && (!g.ultimoUso || Date.now() - g.ultimoUso < VIDA_SESION)) return g;
+      if (!g || !g.id) continue;
+      const quieto = Date.now() - (g.ultimoUso || 0);
+      const deVueltaDePagar = g.pagando && Date.now() - g.pagando < VIDA_SESION;
+      if (!g.ultimoUso || quieto < PAUSA_NUEVA || (deVueltaDePagar && quieto < VIDA_SESION)) return g;
     } catch { }
   }
   return null;
@@ -159,7 +164,7 @@ function tic() {
   const ahora = Date.now();
   const delta = Math.round((ahora - ultimoTic) / 1000);
   ultimoTic = ahora;
-  if (!ses || delta <= 0 || !activo()) return;
+  if (!ses || delta <= 0 || delta > SALTO_MAX || !activo()) return;
   ses.segundos += delta;
   if (productoAbierto) {
     const p = ses.productos[productoAbierto.id];
@@ -395,6 +400,7 @@ document.addEventListener("visibilitychange", () => {
   else { ultimoTic = Date.now(); ultimaAccion = Date.now(); }
 });
 window.addEventListener("pagehide", () => { tic(); enviar(true); });
+window.addEventListener("pageshow", () => { ultimoTic = Date.now(); });
 
 /* dentro de la misma página: lo que no se ve en el "entró a" */
 document.addEventListener("click", e => {
