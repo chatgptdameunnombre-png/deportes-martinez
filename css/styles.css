@@ -1925,3 +1925,11 @@ a.proxi-card:hover { transform: translateY(-4px); border-color: var(--accent); }
 .acc__h .arr { font-size: 13px; }
 .acc__b .opt { font-size: 15px; padding: 8px 12px; }
 .acc--chips .opt { font-size: 14px; padding: 7px 12px; }
+
+.clave-sub { color: var(--ink-soft); font-size: 14px; line-height: 1.5; margin: 0 0 16px; }
+.clave-reglas { list-style: none; margin: -6px 0 16px; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; color: var(--muted); }
+.clave-reglas li::before { content: "○ "; }
+.clave-reglas li.ok { color: var(--accent); }
+.clave-reglas li.ok::before { content: "● "; }
+.clave-err { color: #ff6b6b; font-size: 13.5px; margin: 0; }
+.clave-caja.forzada #claveCerrar, .clave-caja.forzada #claveCancelar { display: none; }
