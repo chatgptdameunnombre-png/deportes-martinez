@@ -1,8 +1,8 @@
-import { db, cambioDeStock } from "./db.js?v=139";
-import { KIKI_EMAIL, AVISO_WEBHOOK, DUENOS, CUENTA_SISTEMA } from "./config.js?v=139";
-import { iniciarClave } from "./clave-panel.js?v=139";
-import { pintarEstadisticas } from "./estadisticas.js?v=139";
-import { mostrarSeccion } from "./panel-nav.js?v=139";
+import { db, cambioDeStock } from "./db.js?v=140";
+import { KIKI_EMAIL, AVISO_WEBHOOK, DUENOS, CUENTA_SISTEMA } from "./config.js?v=140";
+import { iniciarClave } from "./clave-panel.js?v=140";
+import { pintarEstadisticas } from "./estadisticas.js?v=140";
+import { mostrarSeccion } from "./panel-nav.js?v=140";
 
 const $ = s => document.querySelector(s);
 const money = n => "$" + Number(n).toLocaleString("es-MX");
@@ -34,7 +34,7 @@ db.onAuth(user => {
   $("#dash").hidden = false;
   const soyKiki = (user.email || "").toLowerCase() === KIKI_EMAIL;
   $("#pnavPromotores").hidden = !soyKiki;
-  if (soyKiki) import("./promotores.js?v=139").then(m => m.iniciarPromotores(db));
+  if (soyKiki) import("./promotores.js?v=140").then(m => m.iniciarPromotores(db));
   iniciarClave(db, user);
   window.scrollTo(0, 0);
   arrancarDash();
@@ -168,10 +168,20 @@ function pintarHoyBusqueda() {
   const hallados = buscarPlayeras(q, ordenar(productos.filter(p => !p.proximamente)));
   caja.innerHTML = hallados.length
     ? hallados.slice(0, 10).map(p => `
-      <div class="p-row hoy-fila" data-fila="${escHTML(p.id)}">
-        <img class="p-thumb" src="${escHTML(p.imagen || "")}" alt="" onerror="this.style.visibility='hidden'">
-        <div class="p-name"><b>${escHTML(p.nombre)}</b><span>${p.oculto ? "Oculta en la tienda · " : ""}<span>${stockPill(p.stock)}</span></span></div>
+      <div class="hoy-fila${p.oculto ? " hoy-fila--oculta" : ""}" data-fila="${escHTML(p.id)}">
+        <div class="hoy-top">
+          <img class="p-thumb" src="${escHTML(p.imagen || "")}" alt="" onerror="this.style.visibility='hidden'">
+          <div class="p-name"><b>${escHTML(p.nombre)}</b><span><span>${stockPill(p.stock)}</span></span>
+            ${p.oculto ? `<span class="hoy-oculta">🙈 Oculta: no sale en la tienda</span>` : `<span class="hoy-visible">✓ Sale en la tienda</span>`}</div>
+        </div>
         ${controlesStock(p)}
+        <div class="hoy-acciones">
+          ${p.oculto
+            ? `<button type="button" class="btn" data-vis="${escHTML(p.id)}">Mostrar en la tienda</button>
+               <button type="button" class="btn btn--danger" data-del="${escHTML(p.id)}">Borrar</button>`
+            : `<button type="button" class="btn btn--ghost" data-vis="${escHTML(p.id)}">Ocultar de la tienda</button>
+               <button type="button" class="btn btn--danger" data-del="${escHTML(p.id)}">Borrar</button>`}
+        </div>
       </div>`).join("") + (hallados.length > 10 ? `<p class="p-hallados">Hay ${hallados.length}. Escribe más para encontrarla, por ejemplo el año.</p>` : "")
     : sinResultado(q);
 }
@@ -217,7 +227,7 @@ document.addEventListener("click", e => {
   if (!p) return;
   const paso = Number(b.dataset.stock);
   const talla = b.dataset.talla;
-  const filaEl = b.closest(".p-row");
+  const filaEl = b.closest(".p-row, .hoy-fila");
   const pintarFila = () => {
     if (!filaEl) return;
     filaEl.querySelector(".p-tallas").outerHTML = controlesStock(p);
@@ -627,7 +637,7 @@ $("#prodForm").addEventListener("submit", async e => {
 async function borrar(id) {
   const p = productos.find(x => x.id === id);
   if (!confirm(`¿Borrar "${p?.nombre}"? Esta acción no se puede deshacer.`)) return;
-  try { await db.deleteProduct(id); toast("Producto borrado"); }
+  try { await db.deleteProduct(id); toast(`<b>${escHTML(p?.nombre || "")}</b> se borró.`); }
   catch (err) { toast("Error al borrar"); }
 }
 
