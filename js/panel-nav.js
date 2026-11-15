@@ -6,7 +6,7 @@ const $ = s => document.querySelector(s);
 const SECCIONES = {
   hoy: { sel: "#secHoy", titulo: "Hoy" },
   ventas: { sel: "#secVentas", titulo: "Ventas" },
-  productos: { sel: "#secProductos", titulo: "Mis playeras" },
+  productos: { sel: "#secProductos", titulo: "Inventario" },
   visitas: { sel: "#estad", titulo: "Estadísticas" },
   asistente: { sel: "#secAsistente", titulo: "Asistente" },
   piden: { sel: "#secPiden", titulo: "Lo que piden" },
