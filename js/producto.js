@@ -1,13 +1,13 @@
-import { catalogoRapido, fotosRapido, guardarCatalogo, productoRapido } from "./catalogo.js?v=141";
-import { setProductos, initCart, enCarrito, addCart } from "./cart.js?v=141";
-import { ENVIO_DOMICILIO, PERSONALIZACION_PRECIO, PROMO_WEBHOOK, NEGOCIO } from "./config.js?v=141";
-import { iniciarPago, iniciarTransferencia } from "./checkout.js?v=141";
-import { tieneTallas, tallasDe, stockDeTalla, stockTotal, precioTalla, precioDesde, preciosVarian, etiquetaStock, precioAntes } from "./tallas.js?v=141";
-import { onMayoreo, precioHTML, precioMay } from "./mayoreo.js?v=141";
-import { track, trackProducto, cerrarProducto } from "./track.js?v=141";
-import { promotorPorCodigo } from "./promotor.js?v=141";
-import { codigoDe, ponerCodigo, descuentoCodigo, revalidarCodigos } from "./codigos.js?v=141";
-import { fotoMedia } from "./fotos.js?v=141";
+import { catalogoRapido, fotosRapido, guardarCatalogo, productoRapido } from "./catalogo.js?v=142";
+import { setProductos, initCart, enCarrito, addCart } from "./cart.js?v=142";
+import { ENVIO_DOMICILIO, PERSONALIZACION_PRECIO, PROMO_WEBHOOK, NEGOCIO } from "./config.js?v=142";
+import { iniciarPago, iniciarTransferencia } from "./checkout.js?v=142";
+import { tieneTallas, tallasDe, stockDeTalla, stockTotal, precioTalla, precioDesde, preciosVarian, etiquetaStock, precioAntes } from "./tallas.js?v=142";
+import { onMayoreo, precioHTML, precioMay } from "./mayoreo.js?v=142";
+import { track, trackProducto, cerrarProducto } from "./track.js?v=142";
+import { promotorPorCodigo } from "./promotor.js?v=142";
+import { codigoDe, ponerCodigo, descuentoCodigo, revalidarCodigos } from "./codigos.js?v=142";
+import { fotoMedia } from "./fotos.js?v=142";
 const escH = t => String(t ?? "").replace(/[<>&"']/g, c => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;", "'": "&#39;" }[c]));
 
 const $ = s => document.querySelector(s);
@@ -500,7 +500,7 @@ function ponerDatosParaGoogle(p, precio, stock) {
 const escA = t => String(t ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
 async function abrirAviso(p) {
-  const { conectarFormulario } = await import("./sugerencias.js?v=141");
+  const { conectarFormulario } = await import("./sugerencias.js?v=142");
   document.getElementById("avisoModal")?.remove();
   const m = document.createElement("div");
   m.className = "aviso-modal";
