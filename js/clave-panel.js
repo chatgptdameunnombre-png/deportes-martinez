@@ -1,4 +1,4 @@
-import { firebaseConfig, CUENTA_SISTEMA, KIKI_EMAIL } from "./config.js?v=143";
+import { firebaseConfig, CUENTA_SISTEMA, KIKI_EMAIL } from "./config.js?v=144";
 
 const IDT = "https://identitytoolkit.googleapis.com/v1/accounts";
 const $ = s => document.querySelector(s);
