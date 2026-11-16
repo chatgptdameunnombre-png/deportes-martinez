@@ -1,8 +1,8 @@
-import { db, cambioDeStock } from "./db.js?v=144";
-import { KIKI_EMAIL, AVISO_WEBHOOK, DUENOS, CUENTA_SISTEMA } from "./config.js?v=144";
-import { iniciarClave } from "./clave-panel.js?v=144";
-import { pintarEstadisticas } from "./estadisticas.js?v=144";
-import { mostrarSeccion } from "./panel-nav.js?v=144";
+import { db, cambioDeStock } from "./db.js?v=145";
+import { KIKI_EMAIL, AVISO_WEBHOOK, DUENOS, CUENTA_SISTEMA } from "./config.js?v=145";
+import { iniciarClave } from "./clave-panel.js?v=145";
+import { pintarEstadisticas } from "./estadisticas.js?v=145";
+import { mostrarSeccion } from "./panel-nav.js?v=145";
 
 const $ = s => document.querySelector(s);
 const money = n => "$" + Number(n).toLocaleString("es-MX");
@@ -34,7 +34,7 @@ db.onAuth(user => {
   $("#dash").hidden = false;
   const soyKiki = (user.email || "").toLowerCase() === KIKI_EMAIL;
   $("#pnavPromotores").hidden = !soyKiki;
-  if (soyKiki) import("./promotores.js?v=144").then(m => m.iniciarPromotores(db));
+  if (soyKiki) import("./promotores.js?v=145").then(m => m.iniciarPromotores(db));
   iniciarClave(db, user);
   window.scrollTo(0, 0);
   arrancarDash();
