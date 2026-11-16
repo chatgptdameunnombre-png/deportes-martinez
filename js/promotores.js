@@ -1,5 +1,5 @@
-import { limpiarSlug } from "./promotor.js?v=142";
-import { tiempo, hace, sinRepetidos, tarjeta, barra, bloque } from "./estadisticas.js?v=142";
+import { limpiarSlug } from "./promotor.js?v=143";
+import { tiempo, hace, sinRepetidos, tarjeta, barra, bloque } from "./estadisticas.js?v=143";
 
 const $ = s => document.querySelector(s);
 const esc = t => String(t ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
