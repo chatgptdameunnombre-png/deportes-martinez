@@ -1,8 +1,8 @@
-import { db, cambioDeStock } from "./db.js?v=143";
-import { KIKI_EMAIL, AVISO_WEBHOOK, DUENOS, CUENTA_SISTEMA } from "./config.js?v=143";
-import { iniciarClave } from "./clave-panel.js?v=143";
-import { pintarEstadisticas } from "./estadisticas.js?v=143";
-import { mostrarSeccion } from "./panel-nav.js?v=143";
+import { db, cambioDeStock } from "./db.js?v=144";
+import { KIKI_EMAIL, AVISO_WEBHOOK, DUENOS, CUENTA_SISTEMA } from "./config.js?v=144";
+import { iniciarClave } from "./clave-panel.js?v=144";
+import { pintarEstadisticas } from "./estadisticas.js?v=144";
+import { mostrarSeccion } from "./panel-nav.js?v=144";
 
 const $ = s => document.querySelector(s);
 const money = n => "$" + Number(n).toLocaleString("es-MX");
@@ -34,7 +34,7 @@ db.onAuth(user => {
   $("#dash").hidden = false;
   const soyKiki = (user.email || "").toLowerCase() === KIKI_EMAIL;
   $("#pnavPromotores").hidden = !soyKiki;
-  if (soyKiki) import("./promotores.js?v=143").then(m => m.iniciarPromotores(db));
+  if (soyKiki) import("./promotores.js?v=144").then(m => m.iniciarPromotores(db));
   iniciarClave(db, user);
   window.scrollTo(0, 0);
   arrancarDash();
@@ -1142,7 +1142,10 @@ document.addEventListener("click", async e => {
       await cargarVentas();
     } catch (err) {
       pag.disabled = false; pag.textContent = "Ya me pagó";
-      toast("No se pudo guardar");
+      if (String(err && err.message).startsWith("CAMBIO:")) {
+        toast("Este pedido cambió mientras lo veías (ahora: " + String(err.message).slice(7).replace("_", " ") + "). Se recargó la lista.");
+        await cargarVentas();
+      } else toast("No se pudo guardar");
     }
     return;
   }
@@ -1173,7 +1176,10 @@ document.addEventListener("click", async e => {
       await cargarVentas();
     } catch (err) {
       reg.disabled = false; reg.textContent = "↩ Regresar a por entregar";
-      toast("No se pudo regresar");
+      if (String(err && err.message).startsWith("CAMBIO:")) {
+        toast("Este pedido cambió mientras lo veías. Se recargó la lista.");
+        await cargarVentas();
+      } else toast("No se pudo regresar");
     }
     return;
   }
