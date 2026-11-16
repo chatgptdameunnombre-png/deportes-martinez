@@ -1,5 +1,5 @@
-import { firebaseConfig, usaFirebase } from "./config.js?v=143";
-import { PRODUCTOS_SEED } from "./seed.js?v=143";
+import { firebaseConfig, usaFirebase } from "./config.js?v=144";
+import { PRODUCTOS_SEED } from "./seed.js?v=144";
 
 const LS_KEY = "dm_productos";
 const LS_AUTH = "dm_auth";
@@ -202,13 +202,22 @@ async function crearImplFirebase() {
         .sort((a, b) => String(b.fechaISO || "").localeCompare(String(a.fechaISO || "")));
     },
     async marcarVentaPagada(id) {
-      await updateDoc(doc(fdb, "ventas", id), {
-        estado: "pagada",
-        confirmada: new Date().toISOString()
+      const ref = doc(fdb, "ventas", id);
+      await runTransaction(fdb, async tx => {
+        const s = await tx.get(ref);
+        const estado = s.exists() ? s.data().estado : "borrada";
+        if (estado !== "por_cobrar") throw new Error("CAMBIO:" + estado);
+        tx.update(ref, { estado: "pagada", confirmada: new Date().toISOString() });
       });
     },
     async regresarVenta(id) {
-      await updateDoc(doc(fdb, "ventas", id), { estado: "pagada", entregada: deleteField() });
+      const ref = doc(fdb, "ventas", id);
+      await runTransaction(fdb, async tx => {
+        const s = await tx.get(ref);
+        const estado = s.exists() ? s.data().estado : "borrada";
+        if (estado !== "entregada") throw new Error("CAMBIO:" + estado);
+        tx.update(ref, { estado: "pagada", entregada: deleteField() });
+      });
     },
     /* ya salió de la tienda: enviado o recogido, según cómo lo pidió */
     async marcarVentaEntregada(id) {
