@@ -1,11 +1,11 @@
-import { AVISO_WEBHOOK, CANCELAR_WEBHOOK, COBRO_WEBHOOK, PEDIDO_WEBHOOK, ENVIO_DOMICILIO, WHATSAPP_NUMERO, NEGOCIO } from "./config.js?v=142";
-const authListo = import("./auth.js?v=142");
-const dbListo = import("./db.js?v=142").then(m => m.db);
+import { AVISO_WEBHOOK, CANCELAR_WEBHOOK, COBRO_WEBHOOK, PEDIDO_WEBHOOK, ENVIO_DOMICILIO, WHATSAPP_NUMERO, NEGOCIO } from "./config.js?v=143";
+const authListo = import("./auth.js?v=143");
+const dbListo = import("./db.js?v=143").then(m => m.db);
 const abrirLogin = (...a) => authListo.then(m => m.abrirLogin(...a));
 let db = null;
-import { esMayorista as soyMayorista } from "./mayoreo.js?v=142";
-import { track } from "./track.js?v=142";
-import { campoTelefono, conectarTelefono, leerTelefono } from "./telefono.js?v=142";
+import { esMayorista as soyMayorista } from "./mayoreo.js?v=143";
+import { track } from "./track.js?v=143";
+import { campoTelefono, conectarTelefono, leerTelefono } from "./telefono.js?v=143";
 const escH = t => String(t ?? "").replace(/[<>&"']/g, c => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;", "'": "&#39;" }[c]));
 
 const money = n => "$" + Number(n).toLocaleString("es-MX");
@@ -123,6 +123,7 @@ async function mostrarClabe({ productos, entrega, total, cliente, telefono, dire
       "sin existencias": "Ya no hay existencias de lo que pediste en esa talla. No se apartó nada.",
       "demasiados pedidos sin pagar": "Ya tienes 3 pedidos por transferencia sin pagar. Paga o espera a que venzan para hacer otro.",
       "sin productos": "Tu carrito está vacío.",
+      "demasiadas piezas": "Por transferencia puedes apartar hasta 3 playeras por pedido. Quita algunas o paga con tarjeta. No se apartó nada.",
     };
     const err = aviso(MOTIVOS[motivo] || `No pudimos registrar tu pedido. No se apartó nada. Escríbenos por WhatsApp al ${NEGOCIO.telefono} y te ayudamos.`);
     err.style.cursor = "pointer";
