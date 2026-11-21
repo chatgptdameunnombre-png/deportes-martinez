@@ -1,8 +1,8 @@
-import { db, cambioDeStock } from "./db.js?v=145";
-import { KIKI_EMAIL, AVISO_WEBHOOK, DUENOS, CUENTA_SISTEMA } from "./config.js?v=145";
-import { iniciarClave } from "./clave-panel.js?v=145";
-import { pintarEstadisticas } from "./estadisticas.js?v=145";
-import { mostrarSeccion } from "./panel-nav.js?v=145";
+import { db, cambioDeStock } from "./db.js?v=146";
+import { KIKI_EMAIL, AVISO_WEBHOOK, DUENOS, CUENTA_SISTEMA } from "./config.js?v=146";
+import { iniciarClave } from "./clave-panel.js?v=146";
+import { pintarEstadisticas } from "./estadisticas.js?v=146";
+import { mostrarSeccion } from "./panel-nav.js?v=146";
 
 const $ = s => document.querySelector(s);
 const money = n => "$" + Number(n).toLocaleString("es-MX");
@@ -34,11 +34,25 @@ db.onAuth(user => {
   $("#dash").hidden = false;
   const soyKiki = (user.email || "").toLowerCase() === KIKI_EMAIL;
   $("#pnavPromotores").hidden = !soyKiki;
-  if (soyKiki) import("./promotores.js?v=145").then(m => m.iniciarPromotores(db));
+  if (soyKiki) import("./promotores.js?v=146").then(m => m.iniciarPromotores(db));
   iniciarClave(db, user);
+  registrarIngreso(yo);
   window.scrollTo(0, 0);
   arrancarDash();
 });
+
+function registrarIngreso(email) {
+  const k = "dm_ultimo_ingreso_" + email;
+  const ahora = Date.now();
+  let antes = 0;
+  try { antes = Number(localStorage.getItem(k)) || 0; } catch (e) { }
+  if (ahora - antes < 30 * 60 * 1000 || !db.registrarIngreso) return;
+  const ua = navigator.userAgent || "";
+  const aparato = /iPad|Tablet/i.test(ua) ? "Tablet" : (/Mobi|Android|iPhone/i.test(ua) ? "Teléfono" : "Computadora");
+  db.registrarIngreso({ email, cuando: new Date(ahora).toISOString(), aparato })
+    .then(() => { try { localStorage.setItem(k, String(ahora)); } catch (e) { } })
+    .catch(() => { });
+}
 
 $("#logout").onclick = async () => { await db.logout(); window.location.replace("admin.html"); };
 
