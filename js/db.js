@@ -1,5 +1,5 @@
-import { firebaseConfig, usaFirebase } from "./config.js?v=145";
-import { PRODUCTOS_SEED } from "./seed.js?v=145";
+import { firebaseConfig, usaFirebase } from "./config.js?v=146";
+import { PRODUCTOS_SEED } from "./seed.js?v=146";
 
 const LS_KEY = "dm_productos";
 const LS_AUTH = "dm_auth";
@@ -169,6 +169,7 @@ async function crearImplFirebase() {
       await setDoc(doc(fdb, "promos", codigo), datos, { merge: true });
     },
     async borrarPromo(codigo) { await deleteDoc(doc(fdb, "promos", codigo)); },
+    async registrarIngreso(datos) { await addDoc(collection(fdb, "ingresos"), datos); },
 
     /* ---------- promotores (solo Kiki) ---------- */
     async listarPromotores() {
