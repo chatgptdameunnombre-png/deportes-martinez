@@ -1,6 +1,6 @@
 /* Sección Noticias de la HOME: slider de banners (una noticia a la vez, foto grande + texto al lado). */
-import { firebaseConfig } from "./config.js?v=145";
-import { fotoMedia } from "./fotos.js?v=145";
+import { firebaseConfig } from "./config.js?v=146";
+import { fotoMedia } from "./fotos.js?v=146";
 
 const FS = `https://firestore.googleapis.com/v1/projects/${firebaseConfig.projectId}/databases/(default)/documents`;
 const KEY = firebaseConfig.apiKey;
